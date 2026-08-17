@@ -1,0 +1,359 @@
+package com.pdfwala.util
+
+import android.content.Context
+import android.content.Intent
+import android.content.ClipData
+import android.net.Uri
+import android.widget.Toast
+import androidx.core.content.FileProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+
+/**
+ * Utility for opening files with external applications.
+ * 
+ * IMPORTANT: For content URIs from DownloadsProvider or other providers,
+ * we copy to cache first to ensure the receiving app can access the file.
+ * This is necessary because ACTION_VIEW intents to our own app lose
+ * the temporary permission grant when going through intent routing.
+ */
+object FileOpener {
+    
+    private const val CACHE_DIR_NAME = "file_opener_cache"
+    
+    /**
+     * Open a PDF file with an EXTERNAL PDF viewer (excludes our own app).
+     * 
+     * This is used for "Open PDF" after operations. We explicitly exclude our own app
+     * to prevent circular intent issues where permission is lost.
+     * 
+     * NOTE: This is a suspend function that performs I/O on Dispatchers.IO to prevent ANR.
+     * 
+     * @param context Android context
+     * @param uri URI of the PDF file
+     * @return true if intent was launched successfully
+     */
+    suspend fun openPdf(context: Context, uri: Uri): Boolean {
+        return try {
+            // First, try to get an accessible URI (copy to cache if needed) - runs on IO dispatcher
+            val accessibleUri = getAccessibleUri(context, uri, "pdf")
+            
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(accessibleUri, "application/pdf")
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            
+            // Create chooser - include our own app so user can view in PDF Wala
+            val chooser = Intent.createChooser(intent, "Open PDF with...")
+            chooser.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            
+            context.startActivity(chooser)
+            true
+        } catch (e: Exception) {
+            Toast.makeText(context, "No PDF viewer available", Toast.LENGTH_SHORT).show()
+            false
+        }
+    }
+    
+    /**
+     * Open an image file with the default image viewer.
+     * 
+     * NOTE: This is a suspend function that performs I/O on Dispatchers.IO to prevent ANR.
+     * 
+     * @param context Android context
+     * @param uri URI of the image file
+     * @return true if intent was launched successfully
+     */
+    suspend fun openImage(context: Context, uri: Uri?): Boolean {
+        return try {
+            val imageUri = requireOpenableImageUri(context, uri)
+            val accessibleUri = getAccessibleUri(context, imageUri, "image")
+            
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(accessibleUri, "image/*")
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            context.startActivity(intent)
+            true
+        } catch (e: Exception) {
+            android.util.Log.e("FileOpener", "Unable to open image: ${e.message}", e)
+            Toast.makeText(context, "No image viewer available", Toast.LENGTH_SHORT).show()
+            false
+        }
+    }
+
+    private suspend fun requireOpenableImageUri(context: Context, uri: Uri?): Uri = withContext(Dispatchers.IO) {
+        val imageUri = uri ?: throw IllegalArgumentException("Image URI must not be null")
+
+        when (imageUri.scheme) {
+            "file" -> {
+                val path = imageUri.path
+                    ?: throw IllegalArgumentException("Image file URI has no resolved path: $imageUri")
+                if (path.isBlank()) {
+                    throw IllegalArgumentException("Image file URI has an empty resolved path: $imageUri")
+                }
+                if (!File(path).exists()) {
+                    throw IllegalArgumentException("Image file does not exist: $path")
+                }
+            }
+            "content" -> {
+                val inputStream = context.contentResolver.openInputStream(imageUri)
+                    ?: throw IllegalArgumentException("Unable to open input stream for image URI: $imageUri")
+                inputStream.use {
+                    // Opening the stream is enough to validate provider access.
+                }
+            }
+            null, "" -> throw IllegalArgumentException("Image URI has no scheme: $imageUri")
+        }
+
+        imageUri
+    }
+    
+    /**
+     * Open multiple images using ACTION_SEND_MULTIPLE for gallery/viewer.
+     * Falls back to opening first image if multi-send is not supported.
+     *
+     * NOTE: This is a suspend function that performs I/O on Dispatchers.IO to prevent ANR.
+     *
+     * @param context Android context
+     * @param uris List of image URIs to open
+     * @return true if intent was launched successfully
+     */
+    suspend fun openMultipleImages(context: Context, uris: List<Uri>): Boolean {
+        if (uris.isEmpty()) return false
+        if (uris.size == 1) return openImage(context, uris.first())
+        
+        return try {
+            val accessibleUris = ArrayList(uris.map { getAccessibleUri(context, it, "image") })
+            val first = accessibleUris.first()
+
+            // Try true viewer intent first so user lands in gallery-style app if available.
+            val viewIntent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(first, "image/*")
+                clipData = ClipData.newUri(context.contentResolver, "image", first).apply {
+                    accessibleUris.drop(1).forEach { addItem(ClipData.Item(it)) }
+                }
+                putParcelableArrayListExtra(Intent.EXTRA_STREAM, accessibleUris)
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            val viewChooser = Intent.createChooser(viewIntent, "View images...").apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+
+            runCatching {
+                context.startActivity(viewChooser)
+            }.getOrElse {
+                val sendIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+                    type = "image/*"
+                    putParcelableArrayListExtra(Intent.EXTRA_STREAM, accessibleUris)
+                    flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                val chooser = Intent.createChooser(sendIntent, "View images...").apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                context.startActivity(chooser)
+            }
+            
+            true
+        } catch (e: Exception) {
+            // Fallback: open the first image individually
+            openImage(context, uris.first())
+        }
+    }
+    
+    /**
+     * Open a text file with the default text viewer.
+     * 
+     * NOTE: This is a suspend function that performs I/O on Dispatchers.IO to prevent ANR.
+     * 
+     * @param context Android context
+     * @param uri URI of the text file
+     * @return true if intent was launched successfully
+     */
+    suspend fun openTextFile(context: Context, uri: Uri): Boolean {
+        return try {
+            val accessibleUri = getAccessibleUri(context, uri, "txt")
+            
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(accessibleUri, "text/plain")
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            context.startActivity(intent)
+            true
+        } catch (e: Exception) {
+            Toast.makeText(context, "No text viewer available", Toast.LENGTH_SHORT).show()
+            false
+        }
+    }
+    
+    /**
+     * Share a file using the system share dialog.
+     * 
+     * NOTE: This is a suspend function that performs I/O on Dispatchers.IO to prevent ANR.
+     * 
+     * @param context Android context
+     * @param uri URI of the file
+     * @param mimeType MIME type of the file
+     * @param title Title for the share dialog
+     */
+    suspend fun shareFile(context: Context, uri: Uri, mimeType: String, title: String = "Share") {
+        try {
+            val accessibleUri = getAccessibleUri(context, uri, getExtensionFromMimeType(mimeType))
+            
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = mimeType
+                putExtra(Intent.EXTRA_STREAM, accessibleUri)
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+            val chooser = Intent.createChooser(intent, title).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            context.startActivity(chooser)
+        } catch (e: Exception) {
+            Toast.makeText(context, "Unable to share file", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    /**
+     * Get an accessible URI for the file.
+     * 
+     * For content URIs (especially DownloadsProvider), copies to cache and returns
+     * a FileProvider URI. For file:// URIs, converts to FileProvider URI.
+     * For already accessible URIs, returns as-is.
+     * 
+     * NOTE: This is a suspend function that performs I/O on Dispatchers.IO to prevent ANR.
+     */
+    private suspend fun getAccessibleUri(context: Context, uri: Uri, extension: String): Uri = withContext(Dispatchers.IO) {
+        // If it's already a FileProvider URI from our app, return as-is
+        if (uri.authority == "${context.packageName}.provider") {
+            return@withContext uri
+        }
+        
+        // If it's a file:// URI, convert to FileProvider
+        if (uri.scheme == "file") {
+            val file = File(uri.path ?: return@withContext uri)
+            return@withContext if (file.exists()) {
+                FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+            } else {
+                uri
+            }
+        }
+        
+        // For content:// URIs, always copy to cache for reliability
+        // This ensures the receiving app (even our own app) can access the file
+        if (uri.scheme == "content") {
+            val cachedFile = copyToCache(context, uri, extension)
+            if (cachedFile != null) {
+                return@withContext FileProvider.getUriForFile(context, "${context.packageName}.provider", cachedFile)
+            }
+        }
+        
+        // Fallback: return original URI
+        return@withContext uri
+    }
+    
+    /**
+     * Copy a content URI to the app's cache directory.
+     * 
+     * NOTE: This function is called from within a withContext(Dispatchers.IO) block,
+     * so it runs on the IO dispatcher.
+     */
+    private fun copyToCache(context: Context, uri: Uri, extension: String): File? {
+        return try {
+            val cacheDir = File(context.cacheDir, CACHE_DIR_NAME)
+            if (!cacheDir.exists()) {
+                cacheDir.mkdirs()
+            }
+            
+            // Clean old cached files (older than 1 hour)
+            cleanOldCachedFiles(cacheDir)
+            
+            val cachedFile = File(cacheDir, "open_${System.currentTimeMillis()}.$extension")
+            
+            val inputStream = context.contentResolver.openInputStream(uri)
+                ?: throw IllegalArgumentException("Unable to open input stream for URI: $uri")
+
+            inputStream.use { input ->
+                FileOutputStream(cachedFile).use { output ->
+                    input.copyTo(output)
+                }
+            }
+            
+            if (cachedFile.exists() && cachedFile.length() > 0) {
+                cachedFile
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+    
+    /**
+     * Clean cached files older than 1 hour.
+     */
+    private fun cleanOldCachedFiles(cacheDir: File) {
+        try {
+            val oneHourAgo = System.currentTimeMillis() - (60 * 60 * 1000)
+            cacheDir.listFiles()?.forEach { file ->
+                if (file.lastModified() < oneHourAgo) {
+                    file.delete()
+                }
+            }
+        } catch (e: Exception) {
+            // Ignore cleanup errors
+        }
+    }
+    
+    /**
+     * Get file extension from MIME type.
+     */
+    private fun getExtensionFromMimeType(mimeType: String): String {
+        return when {
+            mimeType.contains("pdf") -> "pdf"
+            mimeType.contains("jpeg") || mimeType.contains("jpg") -> "jpg"
+            mimeType.contains("png") -> "png"
+            mimeType.contains("webp") -> "webp"
+            mimeType.contains("plain") -> "txt"
+            mimeType.contains("word") -> "docx"
+            mimeType.contains("excel") || mimeType.contains("spreadsheet") -> "xlsx"
+            mimeType.contains("powerpoint") || mimeType.contains("presentation") -> "pptx"
+            else -> "dat"
+        }
+    }
+    
+    /**
+     * Open a file with the system's default app chooser.
+     * 
+     * NOTE: This is a suspend function that performs I/O on Dispatchers.IO to prevent ANR.
+     * 
+     * @param context Android context
+     * @param uri URI of the file to open
+     * @return true if intent was launched successfully
+     */
+    suspend fun openWithSystemPicker(context: Context, uri: Uri): Boolean {
+        return try {
+            // Determine MIME type from URI
+            val mimeType = context.contentResolver.getType(uri) ?: "*/*"
+            
+            val accessibleUri = getAccessibleUri(context, uri, getExtensionFromMimeType(mimeType))
+            
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(accessibleUri, mimeType)
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            
+            val chooser = Intent.createChooser(intent, "Open with...").apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            
+            context.startActivity(chooser)
+            true
+        } catch (e: Exception) {
+            Toast.makeText(context, "No app available to open this file", Toast.LENGTH_SHORT).show()
+            false
+        }
+    }
+}
