@@ -5,7 +5,6 @@ import com.pdfwala.R
 
 import android.net.Uri
 import androidx.compose.animation.*
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,10 +18,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -88,7 +87,7 @@ fun HistoryMenuButton(
     ) {
         Icon(
             imageVector = Icons.Default.Menu,
-            contentDescription = stringResource(R.string.nav_open_history),
+            contentDescription = stringResource(R.string.history_title),
             tint = MaterialTheme.colorScheme.onSurface
         )
     }
@@ -170,7 +169,7 @@ fun HistorySidebar(
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Text(
-                                    text = "History",
+                                    text = stringResource(R.string.history_title),
                                     style = MaterialTheme.typography.titleLarge,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -241,12 +240,12 @@ fun HistorySidebar(
                                     )
                                     Spacer(modifier = Modifier.height(16.dp))
                                     Text(
-                                        text = "No history yet",
+                                        text = stringResource(R.string.history_empty_title),
                                         style = MaterialTheme.typography.bodyLarge,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     Text(
-                                        text = "Your operations will appear here",
+                                        text = stringResource(R.string.history_empty_subtitle),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                                     )
@@ -434,7 +433,13 @@ private fun HistoryItem(
                     if (entry.outputFileName != null) {
                         val outputCount = entry.outputFileUris.size
                         val displayName = if (outputCount > 1) {
-                            "${entry.outputFileName} ($outputCount files)"
+                            "${entry.outputFileName} ${
+                                pluralStringResource(
+                                    R.plurals.history_output_files,
+                                    outputCount,
+                                    outputCount
+                                )
+                            }"
                         } else {
                             entry.outputFileName
                         }
@@ -524,7 +529,17 @@ private fun HistoryItem(
                             }
                             
                             DropdownMenuItem(
-                                text = { Text(if (isImage) "Open in Gallery" else "Open File") },
+                                text = {
+                                    Text(
+                                        stringResource(
+                                            if (isImage) {
+                                                R.string.history_open_gallery
+                                            } else {
+                                                R.string.history_open_file
+                                            }
+                                        )
+                                    )
+                                },
                                 leadingIcon = { 
                                     Icon(
                                         if (isImage) Icons.Default.Photo else Icons.Default.OpenInNew, 

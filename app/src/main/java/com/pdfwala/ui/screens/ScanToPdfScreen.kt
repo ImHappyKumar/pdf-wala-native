@@ -449,7 +449,7 @@ fun ScanToPdfScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.action_settings),
+                            text = stringResource(R.string.settings_title),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold
                         )

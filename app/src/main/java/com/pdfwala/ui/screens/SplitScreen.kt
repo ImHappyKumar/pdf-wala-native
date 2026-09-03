@@ -4,25 +4,16 @@ import com.pdfwala.util.safeLaunch
 import androidx.compose.ui.res.stringResource
 import com.pdfwala.R
 
-import android.graphics.Bitmap
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
+import androidx.annotation.StringRes
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import com.pdfwala.ui.components.PdfThumbnailGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -31,10 +22,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -56,11 +43,26 @@ import kotlinx.coroutines.withContext
 /**
  * Split modes available in the UI.
  */
-private enum class SplitMode(val title: String, val description: String) {
-    EXTRACT_RANGE("Extract Range", "Extract a range of pages to a new PDF"),
-    ALL_PAGES("All Pages", "Split into individual pages (1 file per page)"),
-    SPECIFIC_PAGES("Specific Pages", "Extract specific page numbers"),
-    VISUAL_SELECT("Visual Selection", "Select specific pages visually from a preview")
+private enum class SplitMode(
+    @StringRes val titleRes: Int,
+    @StringRes val descriptionRes: Int
+) {
+    EXTRACT_RANGE(
+        R.string.split_mode_extract_range,
+        R.string.split_mode_extract_range_description
+    ),
+    ALL_PAGES(
+        R.string.split_mode_all_pages,
+        R.string.split_mode_all_pages_description
+    ),
+    SPECIFIC_PAGES(
+        R.string.split_mode_specific_pages,
+        R.string.split_mode_specific_pages_description
+    ),
+    VISUAL_SELECT(
+        R.string.split_mode_visual_selection,
+        R.string.split_mode_visual_selection_description
+    )
 }
 
 /**
@@ -186,16 +188,19 @@ fun SplitScreen(
                         splitResult.fold(
                             onSuccess = { splitStats ->
                                 success = true
-                                message = "Successfully created ${splitStats.totalFilesCreated} PDF files"
+                                message = context.getString(
+                                    R.string.split_n_files_created,
+                                    splitStats.totalFilesCreated
+                                )
                             },
                             onFailure = { error ->
                                 success = false
-                                message = error.message ?: "Split failed"
+                                message = error.message ?: context.getString(R.string.split_failed_fallback)
                             }
                         )
                     } catch (e: Exception) {
                         success = false
-                        message = e.message ?: "Split failed"
+                        message = e.message ?: context.getString(R.string.split_failed_fallback)
                     }
                 }
                 
@@ -212,7 +217,10 @@ fun SplitScreen(
                         outputFileUri = outputUris.firstOrNull(),
                         outputFileUris = outputUris,
                         outputFileName = "${originalFile.name.removeSuffix(".pdf")}_pages.pdf",
-                        details = "Split into ${outputUris.size} individual pages"
+                        details = context.getString(
+                            R.string.split_all_pages_history_details,
+                            outputUris.size
+                        )
                     )
                 } else if (!success) {
                     HistoryManager.recordFailure(
@@ -261,18 +269,45 @@ fun SplitScreen(
                             
                             splitResult.fold(
                                 onSuccess = { count ->
-                                    Triple(true, "Successfully extracted $count pages\n\nSaved to: ${OutputFolderManager.getOutputFolderPath(context)}/${outputResult.outputFile.fileName}", listOf(outputResult.outputFile.contentUri))
+                                    val outputPath =
+                                        "${OutputFolderManager.getOutputFolderPath(context)}/${outputResult.outputFile.fileName}"
+
+                                    val message = context.getString(
+                                        R.string.split_success_count,
+                                        count
+                                    ) + "\n\n" + context.getString(
+                                        R.string.saved_to,
+                                        outputPath
+                                    )
+
+                                    Triple(
+                                        true,
+                                        message,
+                                        listOf(outputResult.outputFile.contentUri)
+                                    )
                                 },
                                 onFailure = { error ->
                                     outputResult.outputFile.file.delete()
-                                    Triple(false, error.message ?: "Split failed", emptyList())
+                                    Triple(
+                                        false,
+                                        error.message ?: context.getString(R.string.split_failed_fallback),
+                                        emptyList()
+                                    )
                                 }
                             )
                         } else {
-                            Triple(false, "Cannot create output file", emptyList())
+                            Triple(
+                                false,
+                                context.getString(R.string.error_cannot_create_output),
+                                emptyList()
+                            )
                         }
                     } catch (e: Exception) {
-                        Triple(false, e.message ?: "Split failed", emptyList())
+                        Triple(
+                            false,
+                            e.message ?: context.getString(R.string.split_failed_fallback),
+                            emptyList()
+                        )
                     }
                 }
                 
@@ -289,7 +324,7 @@ fun SplitScreen(
                         outputFileUri = result.third.firstOrNull(),
                         outputFileUris = result.third,
                         outputFileName = "split_${originalFile.name}",
-                        details = "Extracted pages from PDF"
+                        details = context.getString(R.string.split_history_details)
                     )
                 } else if (!resultSuccess) {
                     HistoryManager.recordFailure(
@@ -309,7 +344,7 @@ fun SplitScreen(
     Scaffold(
         topBar = {
             ToolTopBar(
-                title = stringResource(R.string.tool_split_pdf),
+                title = stringResource(R.string.split_title),
                 onNavigateBack = onNavigateBack
             )
         }
@@ -328,7 +363,7 @@ fun SplitScreen(
                 if (selectedFile == null) {
                     EmptyState(
                         icon = Icons.Default.CallSplit,
-                        title = stringResource(R.string.metadata_no_pdf_selected),
+                        title = stringResource(R.string.no_pdf_selected),
                         subtitle = stringResource(R.string.split_no_pdf_subtitle),
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -353,7 +388,7 @@ fun SplitScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "Visual Selection",
+                                text = stringResource(R.string.split_mode_visual_selection),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -375,22 +410,28 @@ fun SplitScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             ShortcutChip(
-                                text = "All",
+                                text = stringResource(R.string.action_select_all),
                                 onClick = { selectedVisualPages = (1..pageCount).toSet() },
                                 modifier = Modifier.weight(1f)
                             )
                             ShortcutChip(
-                                text = "Even",
-                                onClick = { selectedVisualPages = (1..pageCount).filter { it % 2 == 0 }.toSet() },
+                                text = stringResource(R.string.split_shortcut_even),
+                                onClick = {
+                                    selectedVisualPages =
+                                        (1..pageCount).filter { it % 2 == 0 }.toSet()
+                                },
                                 modifier = Modifier.weight(1f)
                             )
                             ShortcutChip(
-                                text = "Odd",
-                                onClick = { selectedVisualPages = (1..pageCount).filter { it % 2 != 0 }.toSet() },
+                                text = stringResource(R.string.split_shortcut_odd),
+                                onClick = {
+                                    selectedVisualPages =
+                                        (1..pageCount).filter { it % 2 != 0 }.toSet()
+                                },
                                 modifier = Modifier.weight(1f)
                             )
                             ShortcutChip(
-                                text = "Clear",
+                                text = stringResource(R.string.action_clear),
                                 onClick = { selectedVisualPages = emptySet() },
                                 modifier = Modifier.weight(1f)
                             )
@@ -444,7 +485,7 @@ fun SplitScreen(
                         // Split mode selection
                         item {
                             Text(
-                                text = "Split Mode",
+                                text = stringResource(R.string.split_mode_title),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -504,7 +545,10 @@ fun SplitScreen(
                                             )
                                             Spacer(modifier = Modifier.width(12.dp))
                                             Text(
-                                                text = "This will create $pageCount separate PDF files, one for each page.",
+                                                text = stringResource(
+                                                    R.string.split_all_pages_info,
+                                                    pageCount
+                                                ),
                                                 style = MaterialTheme.typography.bodyMedium
                                             )
                                         }
@@ -545,7 +589,7 @@ fun SplitScreen(
                             ) {
                                 OperationProgress(
                                     progress = progress,
-                                    message = "Extracting pages..."
+                                    message = stringResource(R.string.split_progress_extracting)
                                 )
                             }
                         }
@@ -565,7 +609,7 @@ fun SplitScreen(
                 ) {
                     if (selectedFile == null) {
                         ActionButton(
-                            text = "Select PDF",
+                            text = stringResource(R.string.action_select_pdf),
                             onClick = {
                                 pickPdfLauncher.safeLaunch(arrayOf("application/pdf"), context)
                             },
@@ -576,19 +620,40 @@ fun SplitScreen(
                             SplitMode.EXTRACT_RANGE -> {
                                 val start = startPage.toIntOrNull() ?: 1
                                 val end = endPage.toIntOrNull() ?: pageCount
-                                "${(end - start + 1).coerceAtLeast(0)} pages"
+
+                                stringResource(
+                                    R.string.split_page_count,
+                                    (end - start + 1).coerceAtLeast(0)
+                                )
                             }
+
                             SplitMode.SPECIFIC_PAGES -> {
-                                "${parsePageNumbers(specificPages, pageCount).size} pages"
+                                stringResource(
+                                    R.string.split_page_count,
+                                    parsePageNumbers(specificPages, pageCount).size
+                                )
                             }
+
                             SplitMode.VISUAL_SELECT -> {
-                                "${selectedVisualPages.size} pages"
+                                stringResource(
+                                    R.string.split_page_count,
+                                    selectedVisualPages.size
+                                )
                             }
-                            SplitMode.ALL_PAGES -> "$pageCount files"
+
+                            SplitMode.ALL_PAGES -> {
+                                stringResource(
+                                    R.string.split_file_count,
+                                    pageCount
+                                )
+                            }
                         }
-                        
+
                         ActionButton(
-                            text = "Split ($pageInfo)",
+                            text = stringResource(
+                                R.string.split_action,
+                                pageInfo
+                            ),
                             onClick = {
                                 if (useCustomLocation) {
                                     val fileName = FileManager.generateOutputFileName("split")
@@ -611,7 +676,13 @@ fun SplitScreen(
     if (showResult) {
         ResultDialog(
             isSuccess = resultSuccess,
-            title = if (resultSuccess) "Split Complete" else "Split Failed",
+            title = stringResource(
+                if (resultSuccess) {
+                    R.string.split_complete_title
+                } else {
+                    R.string.split_failed_title
+                }
+            ),
             message = resultMessage,
             onDismiss = { 
                 showResult = false
@@ -684,14 +755,29 @@ private fun performSplit(
             
             result.fold(
                 onSuccess = { count ->
-                    onResult(true, "Successfully extracted $count pages", listOf(outputUri))
+                    onResult(
+                        true,
+                        context.getString(
+                            R.string.split_success_count,
+                            count
+                        ),
+                        listOf(outputUri)
+                    )
                 },
                 onFailure = { error ->
-                    onResult(false, error.message ?: "Split failed", emptyList())
+                    onResult(
+                        false,
+                        error.message ?: context.getString(R.string.split_failed_fallback),
+                        emptyList()
+                    )
                 }
             )
         } else {
-            onResult(false, "Cannot create output file", emptyList())
+            onResult(
+                false,
+                context.getString(R.string.error_cannot_create_output),
+                emptyList()
+            )
         }
         
         onProcessing(false)
@@ -729,12 +815,13 @@ private fun SplitModeOption(
             Spacer(modifier = Modifier.width(8.dp))
             Column {
                 Text(
-                    text = mode.title,
+                    text = stringResource(mode.titleRes),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium
                 )
+
                 Text(
-                    text = mode.description,
+                    text = stringResource(mode.descriptionRes),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -764,7 +851,10 @@ private fun RangeInput(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "Page Range (1 - $maxPages)",
+                text = stringResource(
+                    R.string.split_page_range,
+                    maxPages
+                ),
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Medium
             )
@@ -782,8 +872,11 @@ private fun RangeInput(
                     modifier = Modifier.weight(1f),
                     singleLine = true
                 )
-                
-                Text("to", style = MaterialTheme.typography.bodyMedium)
+
+                Text(
+                    stringResource(R.string.split_to_lowercase),
+                    style = MaterialTheme.typography.bodyMedium
+                )
                 
                 OutlinedTextField(
                     value = endPage,
@@ -821,7 +914,14 @@ private fun SpecificPagesInput(
                 onValueChange = onChange,
                 label = { Text(stringResource(R.string.split_page_numbers)) },
                 placeholder = { Text(stringResource(R.string.split_placeholder)) },
-                supportingText = { Text("Enter page numbers or ranges (1 - $maxPages)") },
+                supportingText = {
+                    Text(
+                        stringResource(
+                            R.string.split_specific_pages_supporting,
+                            maxPages
+                        )
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )

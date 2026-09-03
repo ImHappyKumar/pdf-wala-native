@@ -156,7 +156,7 @@ fun FlattenScreen(
                 val nameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
                 cursor.moveToFirst()
                 cursor.getString(nameIndex)
-            } ?: "Selected PDF"
+            } ?: context.getString(R.string.selected_pdf)
             viewModel.setSourcePdf(it, name)
         }
     }
@@ -170,7 +170,7 @@ fun FlattenScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.tool_flatten_pdf)) },
+                title = { Text(stringResource(R.string.flatten_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.action_back))
@@ -512,7 +512,7 @@ fun FlattenScreen(
             ) {
                 Icon(Icons.Default.Layers, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(stringResource(R.string.tool_flatten_pdf))
+                Text(stringResource(R.string.flatten_title))
             }
             
             // Reset Button

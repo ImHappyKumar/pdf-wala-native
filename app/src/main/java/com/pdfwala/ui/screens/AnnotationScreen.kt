@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -233,16 +233,19 @@ class AnnotationViewModel : ViewModel() {
     }
 }
 
-enum class AnnotationTypeOption(val displayName: String, val icon: androidx.compose.ui.graphics.vector.ImageVector) {
-    HIGHLIGHT("Highlight", Icons.Default.Highlight),
-    UNDERLINE("Underline", Icons.Default.FormatUnderlined),
-    STRIKETHROUGH("Strikethrough", Icons.Default.StrikethroughS),
-    STICKY_NOTE("Sticky Note", Icons.Default.Note),
-    TEXT_BOX("Text Box", Icons.Default.TextFields),
-    RECTANGLE("Rectangle", Icons.Default.Rectangle),
-    CIRCLE("Circle", Icons.Default.Circle),
-    ARROW("Arrow", Icons.Default.ArrowRightAlt),
-    STAMP("Stamp", Icons.Default.Verified)
+enum class AnnotationTypeOption(
+    val displayNameRes: Int,
+    val icon: androidx.compose.ui.graphics.vector.ImageVector
+) {
+    HIGHLIGHT(R.string.annotation_type_highlight, Icons.Default.Highlight),
+    UNDERLINE(R.string.annotation_type_underline, Icons.Default.FormatUnderlined),
+    STRIKETHROUGH(R.string.annotation_type_strikethrough, Icons.Default.StrikethroughS),
+    STICKY_NOTE(R.string.annotation_type_sticky_note, Icons.Default.Note),
+    TEXT_BOX(R.string.annotation_type_text_box, Icons.Default.TextFields),
+    RECTANGLE(R.string.annotation_type_rectangle, Icons.Default.Rectangle),
+    CIRCLE(R.string.annotation_type_circle, Icons.Default.Circle),
+    ARROW(R.string.annotation_type_arrow, Icons.Default.ArrowRightAlt),
+    STAMP(R.string.annotation_type_stamp, Icons.Default.Verified)
 }
 
 data class AnnotationUiState(
@@ -267,6 +270,30 @@ data class AnnotationUiState(
 )
 
 /**
+ * Returns the localized display name for an annotation.
+ */
+@StringRes
+private fun annotationDisplayNameRes(annotation: PdfAnnotation): Int {
+    return when (annotation) {
+        is PdfAnnotation.Highlight -> R.string.annotation_type_highlight
+        is PdfAnnotation.Underline -> R.string.annotation_type_underline
+        is PdfAnnotation.Strikethrough -> R.string.annotation_type_strikethrough
+        is PdfAnnotation.StickyNote -> R.string.annotation_type_sticky_note
+        is PdfAnnotation.TextBox -> R.string.annotation_type_text_box
+
+        is PdfAnnotation.Shape -> when (annotation.shapeType) {
+            ShapeType.RECTANGLE -> R.string.annotation_type_rectangle
+            ShapeType.CIRCLE -> R.string.annotation_type_circle
+            ShapeType.ARROW -> R.string.annotation_type_arrow
+            ShapeType.LINE -> R.string.annotation_type_line
+        }
+
+        is PdfAnnotation.Stamp -> R.string.annotation_type_stamp
+        is PdfAnnotation.FreehandDrawing -> R.string.annotation_type_freehand_drawing
+    }
+}
+
+/**
  * Annotation Screen - Add various annotations to PDF documents.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -278,15 +305,15 @@ fun AnnotationScreen(
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
     val scope = rememberCoroutineScope()
-    
+
     val colorOptions = listOf(
-        Color.YELLOW to "Yellow",
-        Color.RED to "Red",
-        Color.GREEN to "Green",
-        Color.BLUE to "Blue",
-        Color.MAGENTA to "Pink",
-        Color.CYAN to "Cyan",
-        Color.BLACK to "Black"
+        Color.YELLOW,
+        Color.RED,
+        Color.GREEN,
+        Color.BLUE,
+        Color.MAGENTA,
+        Color.CYAN,
+        Color.BLACK
     )
     
     val pdfPickerLauncher = rememberLauncherForActivityResult(
@@ -297,7 +324,7 @@ fun AnnotationScreen(
                 val nameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
                 cursor.moveToFirst()
                 cursor.getString(nameIndex)
-            } ?: "Selected PDF"
+            } ?: context.getString(R.string.annotate_selected_pdf)
             viewModel.setSourcePdf(it, name)
         }
     }
@@ -311,7 +338,7 @@ fun AnnotationScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.tool_annotate_pdf)) },
+                title = { Text(stringResource(R.string.annotate_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.action_back))
@@ -349,7 +376,7 @@ fun AnnotationScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Source PDF",
+                        text = stringResource(R.string.annotate_source_pdf),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -399,7 +426,7 @@ fun AnnotationScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Annotation Type",
+                        text = stringResource(R.string.annotate_type),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -411,7 +438,7 @@ fun AnnotationScreen(
                             FilterChip(
                                 selected = state.selectedType == type,
                                 onClick = { viewModel.setAnnotationType(type) },
-                                label = { Text(type.displayName) },
+                                label = { Text(stringResource(type.displayNameRes)) },
                                 leadingIcon = {
                                     Icon(
                                         type.icon,
@@ -437,7 +464,7 @@ fun AnnotationScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Settings",
+                        text = stringResource(R.string.settings_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -494,7 +521,7 @@ fun AnnotationScreen(
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(stringResource(R.string.label_color), style = MaterialTheme.typography.bodyMedium)
                             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                items(colorOptions) { (color, name) ->
+                                items(colorOptions) { color ->
                                     Box(
                                         modifier = Modifier
                                             .size(40.dp)
@@ -595,7 +622,10 @@ fun AnnotationScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Annotations (${state.annotations.size})",
+                                text = stringResource(
+                                    R.string.annotate_annotations_count,
+                                    state.annotations.size
+                                ),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -618,7 +648,12 @@ fun AnnotationScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = "${index + 1}. ${annotation::class.simpleName ?: "Annotation"} (Page ${annotation.pageIndex + 1})",
+                                        text = stringResource(
+                                            R.string.annotate_item_details,
+                                            index + 1,
+                                            stringResource(annotationDisplayNameRes(annotation)),
+                                            annotation.pageIndex + 1
+                                        ),
                                         modifier = Modifier.weight(1f),
                                         style = MaterialTheme.typography.bodyMedium
                                     )
@@ -679,12 +714,15 @@ fun AnnotationScreen(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                "Annotations Applied!",
+                                stringResource(R.string.annotate_success_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
-                                "${state.annotationsAdded} annotations added",
+                                stringResource(
+                                    R.string.annotate_success_count,
+                                    state.annotationsAdded
+                                ),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }

@@ -1,599 +1,701 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <!-- App -->
     <string name="app_name">PDF Wala</string>
 
-
+    <!-- Common values -->
+    <string name="label_all">सभी</string>
+    <string name="label_none">कोई नहीं</string>
+    <string name="label_quality">गुणवत्ता</string>
+    <string name="label_version">संस्करण</string>
+    <string name="label_build">बिल्ड</string>
+    <string name="label_document">दस्तावेज़</string>
     <string name="action_add">जोड़ें</string>
     <string name="action_add_more">और जोड़ें</string>
     <string name="action_add_more_pdfs">और PDF जोड़ें</string>
-    <string name="action_back">वापस</string>
     <string name="action_cancel">रद्द करें</string>
-    <string name="action_clear">साफ करें</string>
+    <string name="action_clear">साफ़ करें</string>
     <string name="action_close">बंद करें</string>
     <string name="action_compress">संपीड़ित करें</string>
-    <string name="action_delete">हटाएं</string>
+    <string name="action_delete">हटाएँ</string>
     <string name="action_done">हो गया</string>
     <string name="action_merge">मर्ज करें</string>
-    <string name="action_next">अगला</string>
+    <string name="action_next">आगे</string>
     <string name="action_open">खोलें</string>
     <string name="action_open_pdf">PDF खोलें</string>
-    <string name="action_previous">पिछला</string>
-    <string name="action_processing">प्रोसेसिंग...</string>
-    <string name="action_remove">हटाएं</string>
-    <string name="action_save">सेव करें</string>
-    <string name="action_save_as">इस रूप में सेव करें</string>
+    <string name="action_processing">प्रोसेस हो रहा है…</string>
+    <string name="action_remove">हटाएँ</string>
+    <string name="action_save">सहेजें</string>
+    <string name="action_save_as">इस रूप में सहेजें</string>
     <string name="action_select">चुनें</string>
-    <string name="action_settings">सेटिंग्स</string>
+    <string name="action_select_all">सभी चुनें</string>
     <string name="action_split">विभाजित करें</string>
-    <string name="action_submit">भेजें</string>
+    <string name="action_submit">सबमिट करें</string>
     <string name="action_view">देखें</string>
-    <string name="action_navigate">नेविगेट</string>
-    <string name="action_move_up">ऊपर ले जाएं</string>
-    <string name="action_move_down">नीचे ले जाएं</string>
-
-
-    <string name="cd_open_pdf">PDF खोलें</string>
-    <string name="cd_back">वापस</string>
-    <string name="cd_close_search">सर्च बंद करें</string>
-    <string name="cd_clear_search">सर्च साफ करें</string>
-    <string name="cd_stop_search">सर्च रोकें</string>
+    <string name="action_navigate">नेविगेट करें</string>
+    <string name="action_move_up">ऊपर ले जाएँ</string>
+    <string name="action_move_down">नीचे ले जाएँ</string>
+    <string name="cd_close_search">खोज बंद करें</string>
+    <string name="cd_clear_search">खोज साफ़ करें</string>
+    <string name="cd_stop_search">खोज रोकें</string>
     <string name="cd_previous_result">पिछला</string>
-    <string name="cd_next_result">अगला</string>
-    <string name="cd_compression_quality">संपीड़न क्वालिटी</string>
-
-
-    <string name="home_title">PDF Wala</string>
-    <string name="home_subtitle">आपके सभी PDF और इमेज टूल्स एक ही जगह पर</string>
-    <string name="fab_open_pdf">PDF खोलें</string>
-
-
-    <string name="nav_tab_tools">टूल्स</string>
-    <string name="nav_tab_files">फाइलें</string>
-    <string name="nav_open_history">हिस्ट्री खोलें</string>
-
-
-    <string name="category_organize">व्यवस्थित करें</string>
-    <string name="category_convert">कनवर्ट करें</string>
-    <string name="category_markup">मार्कअप</string>
-    <string name="category_security">सुरक्षा</string>
-    <string name="category_optimize">ऑप्टिमाइज़ करें</string>
-    <string name="category_quick_actions">क्विक एक्शन्स</string>
-    <string name="category_image_tools">इमेज टूल्स</string>
-    <string name="category_view_export">देखें और एक्सपोर्ट करें</string>
-
-
-    <string name="tool_merge_pdfs">PDFs मर्ज करें</string>
-    <string name="tool_merge_pdf">PDF मर्ज करें</string>
-    <string name="tool_split_pdf">PDF विभाजित करें</string>
-    <string name="tool_organize_pages">पेज व्यवस्थित करें</string>
-    <string name="tool_rotate_pages">पेज रोटेट करें</string>
-    <string name="tool_extract_pages">पेज निकालें</string>
-    <string name="tool_reorder_pages">पेज पुनः क्रमित करें</string>
-    <string name="tool_delete_pages">पेज हटाएं</string>
-
-
-    <string name="tool_images_to_pdf">इमेज से PDF</string>
-    <string name="tool_pdf_to_images">PDF से इमेज</string>
-    <string name="tool_html_to_pdf">HTML से PDF</string>
-    <string name="tool_extract_text">टेक्स्ट निकालें</string>
-    <string name="tool_scan_to_pdf">स्कैन से PDF</string>
-    <string name="tool_ocr">OCR</string>
-    <string name="tool_image_tools">इमेज टूल्स</string>
-
-
-    <string name="tool_sign_pdf">PDF पर हस्ताक्षर करें</string>
-    <string name="tool_fill_forms">फॉर्म भरें</string>
-    <string name="tool_annotate_pdf">PDF पर टिप्पणी करें</string>
-
-
-    <string name="tool_add_security">सुरक्षा जोड़ें</string>
-    <string name="tool_lock_pdf">PDF लॉक करें</string>
-    <string name="tool_unlock_pdf">PDF अनलॉक करें</string>
-    <string name="tool_add_watermark">वॉटरमार्क जोड़ें</string>
-    <string name="tool_flatten_pdf">PDF फ्लैटन करें</string>
-
-
-    <string name="tool_compress_pdf">PDF संपीड़ित करें</string>
-    <string name="tool_repair_pdf">PDF रिपेयर करें</string>
-    <string name="tool_page_numbers">पेज नंबर</string>
-    <string name="tool_view_metadata">मेटाडेटा देखें</string>
-
-
-    <string name="desc_merge_pdfs">एक से अधिक PDF फाइलों को एक में जोड़ें</string>
-    <string name="desc_split_pdf">एक PDF को कई फाइलों में विभाजित करें</string>
-    <string name="desc_organize_pages">PDF पेज हटाएं या पुनः क्रमित करें</string>
-    <string name="desc_rotate_pages">PDF पेज रोटेट करें</string>
-    <string name="desc_extract_pages">PDF से विशिष्ट पेज निकालें</string>
-    <string name="desc_images_to_pdf">इमेज को PDF में कनवर्ट करें</string>
-    <string name="desc_pdf_to_images">PDF पेज को इमेज में कनवर्ट करें</string>
-    <string name="desc_html_to_pdf">वेबपेज या HTML को PDF में कनवर्ट करें</string>
-    <string name="desc_extract_text">टेक्स्ट कंटेंट को TXT फाइल में निकालें</string>
-    <string name="desc_scan_to_pdf">कैमरे से दस्तावेज़ स्कैन करें</string>
-    <string name="desc_ocr">स्कैन किए गए PDFs को सर्चेबल बनाएं</string>
-    <string name="desc_image_tools">इमेज रिसाइज़, संपीड़ित, कनवर्ट करें</string>
-    <string name="desc_sign_pdf">PDF पर अपने हस्ताक्षर जोड़ें</string>
-    <string name="desc_fill_forms">PDF फॉर्म फील्ड भरें</string>
-    <string name="desc_annotate_pdf">हाइलाइट्स, नोट्स, स्टैम्प जोड़ें</string>
-    <string name="desc_add_security">अपने PDFs को पासवर्ड से सुरक्षित करें</string>
-    <string name="desc_unlock_pdf">PDFs से पासवर्ड हटाएं</string>
-    <string name="desc_add_watermark">टेक्स्ट या इमेज वॉटरमार्क जोड़ें</string>
-    <string name="desc_flatten_pdf">एनोटेशन को कंटेंट में मर्ज करें</string>
-    <string name="desc_compress_pdf">PDF फाइल साइज़ कम करें</string>
-    <string name="desc_repair_pdf">खराब PDF फाइलें ठीक करें</string>
-    <string name="desc_page_numbers">अपने PDF में पेज नंबर जोड़ें</string>
-    <string name="desc_view_metadata">PDF प्रॉपर्टी देखें और एडिट करें</string>
-    <string name="desc_reorder_pages">PDF पेज पुनः क्रमित करें</string>
-    <string name="desc_delete_pages">PDF से पेज हटाएं</string>
-    <string name="desc_compress_image">इमेज फाइल साइज़ कम करें</string>
-    <string name="desc_resize_image">इमेज डाइमेंशन बदलें</string>
-    <string name="desc_convert_format">JPEG ↔ WebP</string>
-    <string name="desc_strip_metadata">EXIF डेटा हटाएं</string>
-    <string name="desc_lock_pdf">अपने PDF को पासवर्ड से सुरक्षित करें</string>
-    <string name="desc_sign">अपने हस्ताक्षर जोड़ें</string>
-    <string name="desc_view_pdf">PDF खोलें और देखें</string>
-    <string name="tool_view_pdf">PDF देखें</string>
-
-
-    <string name="merge_title">PDFs मर्ज करें</string>
-    <string name="merge_empty_title">कोई PDF चयनित नहीं</string>
-    <string name="merge_empty_subtitle">2 या अधिक PDF फाइलें जोड़ें ताकि उन्हें एक दस्तावेज़ में मर्ज किया जा सके</string>
-    <string name="merge_selected_files">चयनित फाइलें (%d)</string>
-    <string name="merge_add_pdfs">PDFs जोड़ें</string>
-    <string name="merge_n_pdfs">%d PDFs मर्ज करें</string>
-    <string name="merge_progress">PDFs मर्ज हो रहे हैं...</string>
-    <string name="merge_complete">मर्ज पूरा हुआ</string>
-    <string name="merge_failed">मर्ज विफल</string>
-    <string name="merge_success_message">%1$d PDFs सफलतापूर्वक मर्ज किए गए\n\nसेव किया गया: %2$s/%3$s</string>
-    <string name="merge_custom_location">कस्टम सेव लोकेशन चुनें</string>
-    <string name="merge_default_path">डिफ़ॉल्ट: %s</string>
-
-
-    <string name="compress_title">PDF संपीड़ित करें</string>
-    <string name="compress_empty_title">कोई PDF चयनित नहीं</string>
-    <string name="compress_empty_subtitle">संपीड़ित करने के लिए एक PDF फाइल चुनें</string>
-    <string name="compress_quality_maximum">अधिकतम क्वालिटी</string>
-    <string name="compress_quality_high">उच्च क्वालिटी</string>
-    <string name="compress_quality_balanced">संतुलित</string>
-    <string name="compress_quality_compressed">संपीड़ित</string>
-    <string name="compress_quality_maximum_compression">अधिकतम संपीड़न</string>
-    <string name="compress_smaller_file">छोटी फाइल</string>
-    <string name="compress_better_quality">बेहतर क्वालिटी</string>
-    <string name="compress_progress">PDF संपीड़ित हो रहा है...</string>
-    <string name="compress_complete">संपीड़न पूरा हुआ</string>
-    <string name="compress_failed">संपीड़न विफल</string>
-    <string name="compress_success">संपीड़न सफल!</string>
-    <string name="compress_saved">संपीड़ित PDF सेव किया गया।</string>
-    <string name="compress_before">पहले: %s</string>
-    <string name="compress_after">बाद में: %s</string>
-    <string name="compress_saved_bytes">बचाया गया: %1$s (%2$d%%)</string>
-    <string name="compress_note_optimized">नोट: यह PDF पहले से ऑप्टिमाइज़ हो सकता है या ज्यादातर टेक्स्ट हो सकता है।</string>
-    <string name="compress_select_pdf">PDF चुनें</string>
-
-
-    <string name="split_title">PDF विभाजित करें</string>
-    <string name="split_empty_title">कोई PDF चयनित नहीं</string>
-    <string name="split_empty_subtitle">कई दस्तावेज़ों में विभाजित करने के लिए एक PDF फाइल चुनें</string>
-    <string name="split_select_pdf">विभाजित करने के लिए PDF चुनें</string>
-    <string name="split_progress">PDF विभाजित हो रहा है...</string>
-    <string name="split_complete">विभाजन पूरा हुआ</string>
-    <string name="split_failed">विभाजन विफल</string>
-    <string name="split_all_pages">सभी पेज</string>
-    <string name="split_every_n_pages">प्रत्येक N पेज</string>
-    <string name="split_custom_range">कस्टम रेंज</string>
-    <string name="split_n_files_created">%d फाइलें बनाई गईं</string>
-
-
-    <string name="pdf_viewer_title">PDF व्यूअर</string>
-    <string name="pdf_document_default_name">PDF दस्तावेज़</string>
-    <string name="pdf_page_indicator">पेज %1$d का %2$d (%3$d%%)</string>
-    <string name="pdf_search_placeholder">PDF में सर्च करें...</string>
-    <string name="pdf_search_no_matches">कोई मैच नहीं</string>
-    <string name="pdf_search_results">%1$d/%2$d</string>
-    <string name="pdf_zoom_in">ज़ूम इन</string>
-    <string name="pdf_zoom_out">ज़ूम आउट</string>
-    <string name="pdf_fit_to_width">चौड़ाई में फिट करें</string>
-    <string name="pdf_tools">टूल्स</string>
-    <string name="pdf_annotations">एनोटेशन्स</string>
-    <string name="pdf_search">सर्च</string>
-    <string name="pdf_share">शेयर करें</string>
-    <string name="pdf_save">सेव करें</string>
-    <string name="pdf_highlighter">हाइलाइटर</string>
-    <string name="pdf_marker">मार्कर</string>
-    <string name="pdf_underline">अंडरलाइन</string>
-    <string name="pdf_clear_annotations">एनोटेशन्स साफ करें?</string>
-    <string name="pdf_clear_annotations_confirm">यह सभी एनोटेशन्स हटा देगा। यह एक्शन वापस नहीं किया जा सकता।</string>
-    <string name="pdf_annotations_saved">एनोटेशन्स सफलतापूर्वक सेव किए गए!</string>
-    <string name="pdf_enter_password">पासवर्ड दर्ज करें</string>
-    <string name="pdf_password_hint">यह PDF पासवर्ड से सुरक्षित है</string>
-    <string name="pdf_password_error">गलत पासवर्ड</string>
-    <string name="pdf_go_to_page">पेज पर जाएं</string>
-    <string name="pdf_page_number">पेज नंबर</string>
-
-
-    <string name="settings_title">सेटिंग्स</string>
-    <string name="settings_section_quality">क्वालिटी सेटिंग्स</string>
-    <string name="settings_section_appearance">अपीयरेंस</string>
-    <string name="settings_section_storage">स्टोरेज</string>
-    <string name="settings_section_support">सपोर्ट</string>
-    <string name="settings_section_about">एप के बारे में</string>
-    <string name="settings_section_language">भाषा</string>
-    <string name="settings_compression_quality">डिफ़ॉल्ट संपीड़न क्वालिटी</string>
-    <string name="settings_compression_quality_value">%1$d%% - %2$s</string>
-    <string name="settings_image_format">डिफ़ॉल्ट इमेज फॉर्मेट</string>
-    <string name="settings_theme_mode">थीम मोड</string>
-    <string name="settings_cache_size">कैश साइज़</string>
-    <string name="settings_request_feature">फीचर रिक्वेस्ट करें</string>
-    <string name="settings_request_feature_subtitle">ऐप को बेहतर बनाने के लिए अपने आइडिया शेयर करें</string>
-    <string name="settings_report_bug">बग रिपोर्ट करें</string>
-    <string name="settings_report_bug_subtitle">समस्याएं ठीक करने में हमारी मदद करें</string>
-    <string name="settings_rate_app">ऐप रेट करें</string>
-    <string name="settings_rate_app_subtitle">ऐप पसंद है? Play Store पर रेट करें</string>
-    <string name="settings_version">वर्जन</string>
-    <string name="settings_privacy_policy">प्राइवेसी पॉलिसी</string>
-    <string name="settings_privacy_policy_subtitle">हमारी प्राइवेसी पॉलिसी देखें</string>
-    <string name="settings_licenses">ओपन सोर्स लाइसेंस</string>
-    <string name="settings_licenses_subtitle">थर्ड-पार्टी लाइसेंस देखें</string>
-    <string name="settings_clear_cache">कैश साफ करें?</string>
-    <string name="settings_clear_cache_message">यह टेम्प फाइल्स और कैश डेटा हटा देगा। आपके सेव किए गए PDFs प्रभावित नहीं होंगे।</string>
-    <string name="settings_cache_cleared">कैश सफलतापूर्वक साफ किया गया</string>
-    <string name="settings_about_title">PDF Wala के बारे में</string>
-    <string name="settings_about_description">PDF Wala एक शक्तिशाली, ऑफलाइन PDF टूल है जो आपको PDF दस्तावेज़ों को तेज़ी से और कुशलता से मैनेज करने में मदद करता है।</string>
-    <string name="settings_about_features">फीचर्स:</string>
-    <string name="settings_about_feature_1">PDFs मर्ज, स्प्लिट, कंप्रेस करें</string>
-    <string name="settings_about_feature_2">इमेज से/में कनवर्ट करें</string>
-    <string name="settings_about_feature_3">वॉटरमार्क और हस्ताक्षर जोड़ें</string>
-    <string name="settings_about_feature_4">OCR और स्कैन से PDF</string>
-    <string name="settings_about_feature_5">PDFs को सुरक्षित और एन्क्रिप्ट करें</string>
-    <string name="settings_about_version">वर्जन</string>
-    <string name="settings_about_build">बिल्ड</string>
-    <string name="settings_about_made_with">बनाया गया</string>
-    <string name="settings_about_kotlin_compose">Kotlin और Jetpack Compose</string>
-    <string name="settings_app_name">PDF Wala</string>
-    <string name="settings_made_with_love">प्रोडक्टिविटी के लिए ❤️ से बनाया गया</string>
-    <string name="settings_copyright">© 2026 PDF Wala</string>
-    <string name="settings_select_language">भाषा चुनें</string>
-    <string name="settings_language_changed">भाषा बदल गई</string>
-
-
-    <string name="language_english">English</string>
-    <string name="language_spanish">Español</string>
-    <string name="language_hindi">हिन्दी</string>
-    <string name="language_chinese">中文</string>
-    <string name="language_portuguese">TODO: Português (Brasil)</string>
-    <string name="language_german">TODO: Deutsch</string>
-
-
-    <string name="image_format_webp">WebP (सुझाया गया)</string>
-    <string name="image_format_jpeg">JPEG</string>
-    <string name="image_format_webp_desc">बेहतर संपीड़न, छोटी फाइलें</string>
-    <string name="image_format_jpeg_desc">यूनिवर्सल कम्पैटिबिलिटी</string>
-
-
-    <string name="theme_light">लाइट</string>
-    <string name="theme_dark">डार्क</string>
-    <string name="theme_system">सिस्टम डिफ़ॉल्ट</string>
-    <string name="theme_light_desc">हमेशा लाइट थीम का उपयोग करें</string>
-    <string name="theme_dark_desc">हमेशा डार्क थीम का उपयोग करें</string>
-    <string name="theme_system_desc">सिस्टम सेटिंग्स का अनुसरण करें</string>
-
-
-    <string name="feature_request_title">फीचर रिक्वेस्ट करें</string>
-    <string name="feature_request_description">PDF Wala को बेहतर बनाने में मदद करने के लिए अपना आइडिया शेयर करें!</string>
-    <string name="feature_request_category">कैटेगरी</string>
-    <string name="feature_request_category_feature">फीचर</string>
-    <string name="feature_request_category_improvement">सुधार</string>
-    <string name="feature_request_category_ui">UI/UX</string>
-    <string name="feature_request_category_other">अन्य</string>
-    <string name="feature_request_idea">अपना आइडिया बताएं</string>
-    <string name="feature_request_placeholder">आप कौन सा फीचर देखना चाहेंगे?</string>
-
-
-    <string name="bug_report_subject">[बग रिपोर्ट] PDF Wala</string>
-    <string name="bug_report_template">बग विवरण:\n[कृपया वह समस्या बताएं जो आपको मिली]\n\nरिप्रोड्यूस करने के चरण:\n1. \n2. \n3. \n\nअपेक्षित व्यवहार:\n[आपको क्या होने की उम्मीद थी?]\n\nवास्तविक व्यवहार:\n[वास्तव में क्या हुआ?]</string>
-
-
-    <string name="error_gmail_required">Gmail ऐप आवश्यक है। कृपया Gmail इंस्टॉल करें या %s पर फीडबैक भेजें</string>
-    <string name="error_generic">एक त्रुटि हुई</string>
-    <string name="error_file_not_found">फाइल नहीं मिली</string>
-    <string name="error_invalid_pdf">अमान्य PDF फाइल</string>
-    <string name="error_password_required">पासवर्ड आवश्यक</string>
-    <string name="error_cannot_create_output">आउटपुट फाइल नहीं बना सकते</string>
-    <string name="error_merge_failed">मर्ज विफल</string>
-    <string name="error_compress_failed">संपीड़न विफल</string>
-    <string name="error_split_failed">विभाजन विफल</string>
-
-
-    <string name="success_operation_complete">ऑपरेशन सफलतापूर्वक पूरा हुआ</string>
-    <string name="success_file_saved">फाइल सफलतापूर्वक सेव की गई</string>
-
-
-    <string name="file_picker_select_pdf">PDF चुनें</string>
-    <string name="file_picker_select_pdfs">PDFs चुनें</string>
-    <string name="file_picker_select_image">इमेज चुनें</string>
-    <string name="file_picker_select_images">इमेज चुनें</string>
-
-
+    <string name="cd_compression_quality">संपीड़न गुणवत्ता</string>
     <string name="label_pdf">PDF</string>
-    <string name="label_page">पेज</string>
-    <string name="label_pages">पेज</string>
-    <string name="label_file">फाइल</string>
-    <string name="label_files">फाइलें</string>
-    <string name="label_size">साइज़</string>
-    <string name="label_quality">क्वालिटी</string>
-    <string name="label_format">फॉर्मेट</string>
+    <string name="label_page">पृष्ठ</string>
+    <string name="label_pages">पृष्ठ</string>
+    <string name="label_file">फ़ाइल</string>
+    <string name="label_files">फ़ाइलें</string>
+    <string name="label_size">आकार</string>
+    <string name="label_format">फ़ॉर्मेट</string>
     <string name="label_password">पासवर्ड</string>
-    <string name="label_loading">लोड हो रहा है...</string>
-    <string name="label_calculating">कैलकुलेट हो रहा है...</string>
-
-
-    <string name="empty_no_files">कोई फाइल चयनित नहीं</string>
-    <string name="empty_no_pdfs">कोई PDF चयनित नहीं</string>
-    <string name="empty_no_images">कोई इमेज चयनित नहीं</string>
-    <string name="empty_add_files">शुरू करने के लिए फाइलें जोड़ें</string>
-
-
+    <string name="label_loading">लोड हो रहा है…</string>
+    <string name="label_calculating">गणना हो रही है…</string>
     <string name="result_success">सफल</string>
     <string name="result_error">त्रुटि</string>
-
-<string name="tool_image_compress">Compress Image</string><string name="tool_image_resize">Resize Image</string><string name="tool_image_convert">Convert Format</string><string name="tool_image_metadata">Strip Metadata</string>    <string name="action_search">खोजें</string>
-    <string name="settings_no_languages_found">कोई भाषा नहीं मिली</string>
-
-    <!-- PDF Viewer additions -->
-    <string name="pdf_stop_search">खोज रोकें</string>
-    <string name="pdf_open_with">इसके साथ खोलें...</string>
-    <string name="pdf_reset_zoom">ज़ूम रीसेट करें</string>
-    <string name="pdf_print">प्रिंट करें</string>
-    <string name="pdf_clear_all_annotations">सभी टिप्पणी हटाएं</string>
-    <string name="pdf_clear_all_dialog_title">सभी टिप्पणी हटाएं?</string>
-    <string name="pdf_compress_this">इस PDF को कंप्रेस करें</string>
-    <string name="pdf_add_watermark_option">वॉटरमार्क जोड़ें</string>
-    <string name="pdf_saving_annotations">टिप्पणियां सहेजी जा रही हैं… %1$d%%</string>
-    <string name="pdf_tool_pan">नेविगेट करें</string>
-    <string name="pdf_tool_eraser">इरेज़र</string>
-    <string name="pdf_brush_size">ब्रश का आकार</string>
-    <string name="pdf_undo">पूर्ववत करें</string>
-    <string name="pdf_select_color">रंग चुनें</string>
-    <string name="pdf_opening">PDF खोला जा रहा है...</string>
-    <string name="pdf_opening_pages">PDF खोला जा रहा है... (%1$d पृष्ठ)</string>
-    <string name="pdf_large_file_warning">बड़ी PDF - कुछ समय लग सकता है</string>
-    <string name="pdf_unable_to_open">PDF खोलने में असमर्थ</string>
-    <string name="pdf_failed_to_render_page">पृष्ठ %1$d लोड करने में विफल</string>
-    <string name="pdf_copied_to_clipboard">कॉपी किया गया!</string>
-    <string name="pdf_selection_highlighted">चयन को हाइलाइट किया गया</string>
-    <string name="pdf_enter_page_number_range">पृष्ठ संख्या दर्ज करें (1-%1$d)</string>
-    <string name="pdf_password_required">पासवर्ड आवश्यक है</string>
-    <string name="pdf_password_incorrect_retry">गलत पासवर्ड। कृपया पुनः प्रयास करें।</string>
-    <string name="pdf_password_protected_enter">यह PDF पासवर्ड से सुरक्षित है। खोलने के लिए पासवर्ड दर्ज करें।</string>
-    <string name="pdf_no_app_found">PDF खोलने के लिए कोई ऐप नहीं मिला</string>
-    <string name="pdf_thickness_highlighter">हाइलाइटर की मोटाई</string>
-    <string name="pdf_thickness_marker">मार्कर की मोटाई</string>
-    <string name="pdf_thickness_underline">अंडरलाइन की मोटाई</string>
-    <string name="pdf_thickness_eraser">इरेज़र का आकार</string>
-    <string name="pdf_px_unit">%1$d px</string>
-    <string name="action_done_editing">संपादन समाप्त</string>
-    <string name="action_edit">संपादित करें</string>
+    <string name="action_search">खोजें</string>
     <string name="action_copy">कॉपी करें</string>
-    <string name="action_go">जाएं</string>
-    <string name="action_go_back">वापस जाएं</string>
+    <string name="action_go">जाएँ</string>
+    <string name="action_back">वापस</string>
     <string name="action_retry">पुनः प्रयास करें</string>
-    <string name="action_clear_all">सभी हटाएं</string>
-    <string name="cd_done_editing">संपादन पूरा</string>
+    <string name="action_clear_all">सभी साफ़ करें</string>
+    <string name="cd_done_editing">संपादन पूरा करें</string>
     <string name="cd_edit">संपादित करें</string>
     <string name="cd_more_options">अधिक विकल्प</string>
-    <string name="cd_save_annotations">टिप्पणियां सहेजें</string>
+    <string name="cd_save_annotations">एनोटेशन सहेजें</string>
     <string name="cd_page_number">पृष्ठ %1$d</string>
     <string name="cd_selected">चयनित</string>
     <string name="color_yellow">पीला</string>
     <string name="color_green">हरा</string>
-    <string name="color_cyan">हल्का नीला</string>
+    <string name="color_cyan">सियान</string>
     <string name="color_pink">गुलाबी</string>
     <string name="color_red">लाल</string>
     <string name="color_blue">नीला</string>
     <string name="color_brown">भूरा</string>
     <string name="color_black">काला</string>
-
-    <!-- Metadata Screen additions -->
-    <string name="metadata_no_pdf_selected">कोई PDF चयनित नहीं</string>
-    <string name="metadata_no_pdf_selected_subtitle">मेटाडेटा देखने के लिए एक PDF फ़ाइल चुनें</string>
-    <string name="metadata_pages_and_size">%1$d पृष्ठ • %2$s</string>
-    <string name="metadata_strip_banner_title">दस्तावेज़ मेटाडेटा हटाएं</string>
-    <string name="metadata_strip_banner_subtitle">साझा करने से पहले सभी छिपे हुए ट्रैकिंग विवरण हटाएं।</string>
-    <string name="metadata_strip_all">सभी हटाएं</string>
-    <string name="metadata_basic_title">मूल मेटाडेटा</string>
     <string name="label_title">शीर्षक</string>
     <string name="label_author">लेखक</string>
     <string name="label_subject">विषय</string>
     <string name="label_keywords">कीवर्ड</string>
-    <string name="metadata_keywords_placeholder">कॉमा से अलग किए गए कीवर्ड</string>
-    <string name="metadata_not_set">सेट नहीं है</string>
-    <string name="metadata_advanced_properties">उन्नत गुण</string>
-    <string name="cd_collapse">सिकोड़ें</string>
+    <string name="cd_collapse">समेटें</string>
     <string name="cd_expand">विस्तार करें</string>
     <string name="label_creator">निर्माता</string>
-    <string name="label_producer">उत्पादक</string>
-    <string name="metadata_unknown">अज्ञात</string>
-    <string name="label_created">निर्मित</string>
-    <string name="label_modified">संशोधित</string>
+    <string name="label_producer">प्रोड्यूसर</string>
+    <string name="label_created">बनाया गया</string>
+    <string name="label_modified">संशोधित किया गया</string>
     <string name="label_pdf_version">PDF संस्करण</string>
     <string name="label_encrypted">एन्क्रिप्टेड</string>
     <string name="label_yes">हाँ</string>
     <string name="label_no">नहीं</string>
-    <string name="metadata_updating_progress">मेटाडेटा अपडेट हो रहा है...</string>
-    <string name="metadata_updated_success">मेटाडेटा सफलतापूर्वक अपडेट किया गया</string>
-    <string name="metadata_update_failed">अपडेट विफल रहा</string>
-    <string name="metadata_stripping_failed">हटाना विफल रहा</string>
-    <string name="metadata_cannot_create_output">आउटपुट फ़ाइल नहीं बनाई जा सकती</string>
-    <string name="metadata_saved_to">%1$s
+    <string name="action_select_pdf">PDF चुनें</string>
+    <string name="action_save_changes">बदलाव सहेजें</string>
+    <string name="action_select_another_pdf">दूसरा PDF चुनें</string>
+    <string name="action_crop">क्रॉप करें</string>
+    <string name="cd_capture">दस्तावेज़ कैप्चर करें</string>
+    <string name="label_stamp_type">स्टैम्प का प्रकार</string>
+    <string name="label_width">चौड़ाई</string>
+    <string name="label_height">ऊँचाई</string>
+    <string name="action_add_annotation">एनोटेशन जोड़ें</string>
+    <string name="action_add_more_images">और इमेज जोड़ें</string>
+    <string name="action_ok">ठीक है</string>
+    <string name="action_share_all">सभी साझा करें</string>
+    <string name="cd_open_link">लिंक खोलें</string>
+    <string name="cd_toggle_visibility">दृश्यता बदलें</string>
+    <string name="action_move_first">सबसे ऊपर ले जाएँ</string>
+    <string name="action_move_last">सबसे नीचे ले जाएँ</string>
+    <string name="action_change">बदलें</string>
+    <string name="action_reset">रीसेट करें</string>
+    <string name="label_page_number">पृष्ठ संख्या</string>
+    <string name="label_color">रंग</string>
+    <string name="saved_to">यहाँ सहेजा गया: %1$s</string>
+    <string name="label_unknown">अज्ञात</string>
+    <string name="no_pdf_selected">कोई PDF चयनित नहीं</string>
+    <string name="original_size">मूल आकार: %1$s</string>
+    <string name="file_size_estimated">फ़ाइल का आकार: ~%1$s</string>
+    <plurals name="label_pages_count">
+        <item quantity="one">%d पृष्ठ</item>
+        <item quantity="other">%d पृष्ठ</item>
+    </plurals>
+    <plurals name="label_images_count">
+        <item quantity="one">%1$d इमेज</item>
+        <item quantity="other">%1$d इमेज</item>
+    </plurals>
+    <plurals name="minutes_ago">
+        <item quantity="one">%d मिनट पहले</item>
+        <item quantity="other">%d मिनट पहले</item>
+    </plurals>
+    <plurals name="hours_ago">
+        <item quantity="one">%d घंटे पहले</item>
+        <item quantity="other">%d घंटे पहले</item>
+    </plurals>
+    <plurals name="days_ago">
+        <item quantity="one">%d दिन पहले</item>
+        <item quantity="other">%d दिन पहले</item>
+    </plurals>
+    <string name="just_now">अभी</string>
+
+    <!-- Home & categories -->
+    <string name="home_subtitle">आपके सभी PDF और इमेज टूल एक ही जगह</string>
+    <string name="category_organize">व्यवस्थित करें</string>
+    <string name="category_convert">कन्वर्ट करें</string>
+    <string name="category_security">सुरक्षा</string>
+    <string name="category_optimize">ऑप्टिमाइज़ करें</string>
+    <string name="category_quick_actions">त्वरित कार्रवाइयाँ</string>
+    <string name="category_view_export">देखें और एक्सपोर्ट करें</string>
+
+    <!-- Tools -->
+    <string name="tool_merge_pdf">PDF मर्ज करें</string>
+    <string name="tool_extract_pages">पृष्ठ निकालें</string>
+    <string name="tool_scan_to_pdf">PDF में स्कैन करें</string>
+    <string name="tool_image_compress">इमेज संपीड़ित करें</string>
+    <string name="tool_image_resize">इमेज का आकार बदलें</string>
+    <string name="tool_image_convert">इमेज कन्वर्ट करें</string>
+    <string name="tool_image_metadata">इमेज का मेटाडेटा हटाएँ</string>
+    <string name="tool_lock_pdf">PDF पर पासवर्ड लगाएँ</string>
+    <string name="tool_unlock_pdf">PDF का पासवर्ड हटाएँ</string>
+    <string name="tool_view_metadata">PDF के गुण</string>
+    <string name="desc_merge_pdfs">कई PDF फ़ाइलों को एक दस्तावेज़ में मिलाएँ</string>
+    <string name="desc_split_pdf">एक PDF को अलग-अलग दस्तावेज़ों में विभाजित करें</string>
+    <string name="desc_organize_pages">PDF के पृष्ठों का क्रम बदलें, हटाएँ या निकालें</string>
+    <string name="desc_rotate_pages">PDF के पृष्ठों को मनचाही दिशा में घुमाएँ</string>
+    <string name="desc_extract_pages">चयनित पृष्ठों को अलग PDF के रूप में सहेजें</string>
+    <string name="desc_images_to_pdf">चयनित इमेज से PDF बनाएँ</string>
+    <string name="desc_pdf_to_images">PDF के पृष्ठों को इमेज फ़ाइलों में कन्वर्ट करें</string>
+    <string name="desc_html_to_pdf">वेबपेज या HTML सामग्री को PDF में कन्वर्ट करें</string>
+    <string name="desc_extract_text">PDF से टेक्स्ट निकालकर टेक्स्ट फ़ाइल के रूप में सहेजें</string>
+    <string name="desc_scan_to_pdf">कैमरे से दस्तावेज़ स्कैन करके PDF बनाएँ</string>
+    <string name="desc_ocr">स्कैन किए गए पृष्ठों में टेक्स्ट पहचानें ताकि उसे खोज और कॉपी किया जा सके</string>
+    <string name="desc_image_tools">इमेज को संपीड़ित, आकार बदलें, कन्वर्ट करें या मेटाडेटा हटाएँ</string>
+    <string name="desc_sign_pdf">PDF में अपना हस्ताक्षर जोड़ें</string>
+    <string name="desc_fill_forms">इंटरैक्टिव PDF फ़ॉर्म फ़ील्ड भरें</string>
+    <string name="desc_annotate_pdf">PDF में हाइलाइट, नोट्स, ड्रॉइंग और स्टैम्प जोड़ें</string>
+    <string name="desc_unlock_pdf">PDF से पासवर्ड सुरक्षा हटाएँ</string>
+    <string name="desc_add_watermark">PDF में टेक्स्ट या इमेज वॉटरमार्क जोड़ें</string>
+    <string name="desc_flatten_pdf">एनोटेशन और फ़ॉर्म फ़ील्ड को PDF का स्थायी हिस्सा बनाएँ</string>
+    <string name="desc_compress_pdf">PDF का फ़ाइल आकार कम करें</string>
+    <string name="desc_repair_pdf">क्षतिग्रस्त या न खुलने वाली PDF को ठीक करने का प्रयास करें</string>
+    <string name="desc_page_numbers">PDF में पृष्ठ संख्या जोड़ें</string>
+    <string name="desc_view_metadata">PDF के गुण देखें और संपादित करें</string>
+    <string name="desc_reorder_pages">PDF के पृष्ठों का क्रम बदलें</string>
+    <string name="desc_delete_pages">PDF से चयनित पृष्ठ हटाएँ</string>
+    <string name="desc_compress_image">इमेज का फ़ाइल आकार कम करें</string>
+    <string name="desc_resize_image">इमेज के आयाम बदलें</string>
+    <string name="desc_convert_format">JPEG और WebP के बीच कन्वर्ट करें</string>
+    <string name="desc_strip_metadata">इमेज से EXIF मेटाडेटा हटाएँ</string>
+    <string name="desc_lock_pdf">पासवर्ड से PDF को सुरक्षित करें</string>
+    <string name="desc_sign">अपना हस्ताक्षर जोड़ें</string>
+    <string name="desc_view_pdf">PDF खोलें और देखें</string>
+    <string name="tool_view_pdf">PDF देखें</string>
+
+    <!-- Merge PDF -->
+    <string name="merge_title">PDF मर्ज करें</string>
+    <string name="merge_empty_subtitle">मर्ज करने के लिए कम से कम दो PDF फ़ाइलें चुनें</string>
+    <string name="merge_selected_files">चयनित PDF (%d)</string>
+    <string name="merge_add_pdfs">PDF फ़ाइलें जोड़ें</string>
+    <string name="merge_n_pdfs">%d PDF मर्ज करें</string>
+    <string name="merge_progress">PDF मर्ज हो रहे हैं…</string>
+    <string name="merge_complete">PDF मर्ज हो गए</string>
+    <string name="merge_failed">चयनित PDF मर्ज नहीं हो सके</string>
+    <string name="merge_success_message">%1$d PDF सफलतापूर्वक मर्ज हो गए।\n\nयहाँ सहेजे गए: %2$s/%3$s</string>
+    <string name="merge_custom_location">फ़ाइल सहेजने की जगह चुनें</string>
+    <string name="merge_default_path">डिफ़ॉल्ट स्थान: %s</string>
+    <string name="merge_details_count">%1$d PDF फ़ाइलें मर्ज की गईं</string>
+    <string name="merge_success_count">%1$d PDFs सफलतापूर्वक मर्ज की गईं</string>
+
+    <!-- Compress PDF -->
+    <string name="compress_title">PDF संपीड़ित करें</string>
+    <string name="compress_empty_subtitle">फ़ाइल का आकार कम करने के लिए PDF चुनें</string>
+    <string name="compress_quality_maximum">सर्वोत्तम गुणवत्ता</string>
+    <string name="compress_quality_high">उच्च गुणवत्ता</string>
+    <string name="compress_quality_balanced">संतुलित</string>
+    <string name="compress_quality_maximum_compression">सबसे छोटा फ़ाइल आकार</string>
+    <string name="compress_smaller_file">छोटी फ़ाइल</string>
+    <string name="compress_better_quality">बेहतर गुणवत्ता</string>
+    <string name="compress_progress">PDF संपीड़ित हो रहा है…</string>
+    <string name="compress_complete">संपीड़न पूरा हुआ</string>
+    <string name="compress_failed">यह PDF संपीड़ित नहीं हो सकी</string>
+    <string name="compress_success">PDF सफलतापूर्वक संपीड़ित हुई</string>
+    <string name="compress_saved">आपकी संपीड़ित PDF तैयार है और सहेज दी गई है।</string>
+    <string name="compress_before">मूल: %s</string>
+    <string name="compress_after">संपीड़ित: %s</string>
+    <string name="compress_saved_bytes">इतना कम हुआ: %1$s (%2$d%%)</string>
+    <string name="compress_note_optimized">यह PDF पहले से ऑप्टिमाइज़ हो सकती है, इसलिए आकार में कमी सीमित हो सकती है।</string>
+    <string name="compress_no_pdf_subtitle">फ़ाइल का आकार कम करने के लिए PDF चुनें</string>
+    <string name="compression_level">संपीड़न स्तर</string>
+    <string name="compress_target_size_too_large">लक्ष्य आकार मूल फ़ाइल के आकार से कम होना चाहिए।</string>
+    <string name="compress_estimated_result">अनुमानित परिणाम</string>
+    <string name="compress_target_size_optimization">लक्ष्य आकार ऑप्टिमाइज़ेशन</string>
+    <string name="compress_target_size_description">%1$s %2$s से कम रखने के लिए आवश्यक न्यूनतम गुणवत्ता तक संपीड़ित किया जाएगा</string>
+    <string name="compress_success_message">संपीड़न सफल रहा!\n\nपहले: %1$s\nबाद में: %2$s\nसहेजा गया: %3$s (%4$d%%)</string>
+    <string name="compress_no_reduction_message">संपीड़ित PDF सहेज दी गई।\n\nपहले: %1$s\nबाद में: %2$s\n\nनोट: फ़ाइल के आकार में कोई कमी नहीं हुई। इस PDF में संभवतः अधिकतर टेक्स्ट या वेक्टर सामग्री है, जिसे इमेज ऑप्टिमाइज़ेशन के माध्यम से और संपीड़ित नहीं किया जा सकता। उच्च संपीड़न स्तर आज़माएँ या हो सकता है कि फ़ाइल पहले से न्यूनतम आकार पर हो।</string>
+    <string name="compress_target_size_not_reached">लक्ष्य आकार प्राप्त नहीं हुआ।\n\nलक्ष्य: %1$s %2$s\nप्राप्त आकार: %3$s\n\nनोट: फ़ाइल की सामग्री को नुकसान पहुँचाए बिना उसे न्यूनतम संभव आकार तक संपीड़ित किया गया।</string>
+    <string name="compression_failed">संपीड़न विफल रहा</string>
+    <string name="compress_details_from_size">%1$s से संपीड़ित</string>
+    <string name="target_size">लक्ष्य आकार</string>
+    <string name="compression_level_low">कम</string>
+    <string name="compression_level_medium">मध्यम</string>
+    <string name="compression_level_high">उच्च</string>
+    <string name="compression_level_maximum">अधिकतम</string>
+    <string name="compression_level_low_description">बेहतरीन गुणवत्ता, फ़ाइल आकार में मामूली कमी</string>
+    <string name="compression_level_medium_description">गुणवत्ता और फ़ाइल आकार के बीच अच्छा संतुलन</string>
+    <string name="compression_level_high_description">छोटी फ़ाइल, कम गुणवत्ता</string>
+    <string name="compression_level_maximum_description">सबसे छोटी फ़ाइल, सबसे कम गुणवत्ता</string>
+
+    <!-- Split PDF -->
+    <string name="split_title">PDF विभाजित करें</string>
+    <string name="split_empty_subtitle">अलग-अलग दस्तावेज़ बनाने के लिए PDF चुनें</string>
+    <string name="split_progress">PDF विभाजित किया जा रहा है…</string>
+    <string name="split_complete">PDF सफलतापूर्वक विभाजित हुई</string>
+    <string name="split_failed">यह PDF विभाजित नहीं की जा सकी</string>
+    <string name="split_complete_title">विभाजन पूरा हुआ</string>
+    <string name="split_failed_title">विभाजन विफल रहा</string>
+    <string name="split_every_n_pages">हर N पृष्ठ</string>
+    <string name="split_custom_range">कस्टम सीमा</string>
+    <string name="split_n_files_created">%d फ़ाइलें बनाई गईं</string>
+    <string name="split_no_pdf_subtitle">अलग-अलग दस्तावेज़ बनाने के लिए PDF फ़ाइल चुनें</string>
+    <string name="split_switch_mode">विभाजन मोड बदलें</string>
+    <string name="split_all_pages_title">PDF विभाजित करें — सभी पृष्ठ</string>
+    <string name="split_placeholder">जैसे, 1, 3, 5-8, 10</string>
+    <string name="split_from">से</string>
+    <string name="split_to">तक</string>
+    <string name="split_page_numbers">पृष्ठ संख्या</string>
+
+    <string name="split_mode_title">विभाजन मोड</string>
+    <string name="split_mode_extract_range">पृष्ठ सीमा निकालें</string>
+    <string name="split_mode_extract_range_description">पृष्ठों की एक सीमा को नई PDF में निकालें</string>
+    <string name="split_mode_all_pages">सभी पृष्ठ</string>
+    <string name="split_mode_all_pages_description">अलग-अलग पृष्ठों में विभाजित करें (प्रति पृष्ठ 1 फ़ाइल)</string>
+    <string name="split_mode_specific_pages">विशिष्ट पृष्ठ</string>
+    <string name="split_mode_specific_pages_description">विशिष्ट पृष्ठ संख्या निकालें</string>
+    <string name="split_mode_visual_selection">दृश्य चयन</string>
+    <string name="split_mode_visual_selection_description">प्रीव्यू से विशिष्ट पृष्ठों का चयन करें</string>
+
+    <string name="split_shortcut_all">सभी</string>
+    <string name="split_shortcut_even">सम</string>
+    <string name="split_shortcut_odd">विषम</string>
+
+    <string name="split_all_pages_info">इससे %1$d अलग-अलग PDF फ़ाइलें बनेंगी, प्रत्येक पृष्ठ के लिए एक।</string>
+    <string name="split_progress_extracting">पृष्ठ निकाले जा रहे हैं…</string>
+    <string name="split_page_count">%1$d पृष्ठ</string>
+    <string name="split_file_count">%1$d फ़ाइलें</string>
+    <string name="split_action">विभाजित करें (%1$s)</string>
+    <string name="split_page_range">पृष्ठ सीमा (1 - %1$d)</string>
+    <string name="split_to_lowercase">तक</string>
+    <string name="split_specific_pages_supporting">पृष्ठ संख्या या सीमाएँ दर्ज करें (1 - %1$d)</string>
+
+    <string name="split_success_count">%1$d पृष्ठ सफलतापूर्वक निकाले गए</string>
+    <string name="split_success_count_saved_to">%1$d पृष्ठ सफलतापूर्वक निकाले गए\n\nयहाँ सहेजा गया: %2$s</string>
+    <string name="split_failed_fallback">विभाजन विफल रहा</string>
+    <string name="split_history_details">PDF से पृष्ठ निकाले गए</string>
+    <string name="split_all_pages_history_details">%1$d अलग-अलग पृष्ठों में विभाजित किया गया</string>
+
+    <!-- PDF viewer -->
+    <string name="pdf_viewer_title">PDF व्यूअर</string>
+    <string name="pdf_document_default_name">PDF दस्तावेज़</string>
+    <string name="pdf_page_indicator">पृष्ठ %1$d / %2$d (%3$d%%)</string>
+    <string name="pdf_search_placeholder">इस PDF में खोजें…</string>
+    <string name="pdf_search_no_matches">कोई परिणाम नहीं मिला</string>
+    <string name="pdf_search_results">%1$d/%2$d</string>
+    <string name="pdf_zoom_in">ज़ूम इन करें</string>
+    <string name="pdf_zoom_out">ज़ूम आउट करें</string>
+    <string name="pdf_fit_to_width">चौड़ाई के अनुसार फ़िट करें</string>
+    <string name="pdf_tools">टूल</string>
+    <string name="pdf_annotations">एनोटेट करें</string>
+    <string name="pdf_share">साझा करें</string>
+    <string name="pdf_highlighter">हाइलाइटर</string>
+    <string name="pdf_marker">मार्कर</string>
+    <string name="pdf_underline">अंडरलाइन</string>
+    <string name="pdf_clear_annotations_confirm">सभी एनोटेशन हटा दिए जाएँगे। यह कार्रवाई वापस नहीं की जा सकती।</string>
+    <string name="pdf_annotations_saved">एनोटेशन सहेजे गए।</string>
+    <string name="pdf_enter_password">पासवर्ड दर्ज करें</string>
+    <string name="pdf_password_hint">यह PDF पासवर्ड से सुरक्षित है</string>
+    <string name="pdf_password_error">गलत पासवर्ड</string>
+    <string name="pdf_go_to_page">पृष्ठ पर जाएँ</string>
+    <string name="pdf_stop_search">खोज रोकें</string>
+    <string name="pdf_open_with">इससे खोलें…</string>
+    <string name="pdf_reset_zoom">ज़ूम रीसेट करें</string>
+    <string name="pdf_print">प्रिंट करें</string>
+    <string name="pdf_clear_all_annotations">सभी एनोटेशन हटाएँ</string>
+    <string name="pdf_clear_all_dialog_title">सभी एनोटेशन हटाएँ?</string>
+    <string name="pdf_compress_this">इस PDF को संपीड़ित करें</string>
+    <string name="pdf_add_watermark_option">वॉटरमार्क जोड़ें</string>
+    <string name="pdf_saving_annotations">एनोटेशन सहेजे जा रहे हैं… %1$d%%</string>
+    <string name="pdf_tool_pan">पैन करें</string>
+    <string name="pdf_tool_eraser">इरेज़र</string>
+    <string name="pdf_brush_size">ब्रश का आकार</string>
+    <string name="pdf_undo">पूर्ववत करें</string>
+    <string name="pdf_select_color">रंग चुनें</string>
+    <string name="pdf_opening">PDF खुल रही है…</string>
+    <string name="pdf_opening_pages">PDF खुल रही है… (%1$d पृष्ठ)</string>
+    <string name="pdf_large_file_warning">बड़ी PDF — इसे खुलने में थोड़ा अधिक समय लग सकता है</string>
+    <string name="pdf_unable_to_open">यह PDF नहीं खुल सकी</string>
+    <string name="pdf_failed_to_render_page">पृष्ठ %1$d प्रदर्शित नहीं किया जा सका</string>
+    <string name="pdf_copied_to_clipboard">कॉपी किया गया</string>
+    <string name="pdf_selection_highlighted">चयन हाइलाइट किया गया</string>
+    <string name="pdf_enter_page_number_range">पृष्ठ संख्या दर्ज करें (1-%1$d)</string>
+    <string name="pdf_password_required">पासवर्ड आवश्यक है</string>
+    <string name="pdf_password_incorrect_retry">गलत पासवर्ड। कृपया फिर से प्रयास करें।</string>
+    <string name="pdf_password_protected_enter">यह PDF पासवर्ड से सुरक्षित है। जारी रखने के लिए पासवर्ड दर्ज करें।</string>
+    <string name="pdf_no_app_found">इस PDF को खोलने के लिए कोई संगत ऐप उपलब्ध नहीं है</string>
+    <string name="pdf_thickness_highlighter">हाइलाइटर की मोटाई</string>
+    <string name="pdf_thickness_marker">मार्कर की मोटाई</string>
+    <string name="pdf_thickness_underline">अंडरलाइन की मोटाई</string>
+    <string name="pdf_thickness_eraser">इरेज़र का आकार</string>
+    <string name="pdf_px_unit">%1$d px</string>
+
+    <!-- Settings -->
+    <string name="settings_title">सेटिंग्स</string>
+    <string name="settings_section_appearance">दिखावट</string>
+    <string name="settings_section_storage">स्टोरेज</string>
+    <string name="settings_section_support">सहायता</string>
+    <string name="settings_section_about">ऐप के बारे में</string>
+    <string name="settings_section_language">भाषा</string>
+    <string name="settings_compression_quality">डिफ़ॉल्ट संपीड़न गुणवत्ता</string>
+    <string name="settings_compression_quality_value">%1$d%% - %2$s</string>
+    <string name="settings_image_format">डिफ़ॉल्ट इमेज फ़ॉर्मेट</string>
+    <string name="settings_theme_mode">थीम</string>
+    <string name="settings_cache_size">अस्थायी स्टोरेज</string>
+    <string name="settings_request_feature_subtitle">हमें बताएँ कि हम PDF Wala को कैसे बेहतर बना सकते हैं</string>
+    <string name="settings_report_bug">समस्या की रिपोर्ट करें</string>
+    <string name="settings_report_bug_subtitle">हमें बताएँ कि क्या गलत हुआ</string>
+    <string name="settings_rate_app">PDF Wala को रेट करें</string>
+    <string name="settings_rate_app_subtitle">PDF Wala पसंद आ रहा है? Google Play पर रेट करें</string>
+    <string name="settings_privacy_policy">गोपनीयता नीति</string>
+    <string name="settings_privacy_policy_subtitle">जानें कि PDF Wala आपके डेटा को कैसे संभालता है</string>
+    <string name="settings_licenses_subtitle">थर्ड-पार्टी घटकों के लाइसेंस देखें</string>
+    <string name="settings_clear_cache">अस्थायी डेटा साफ़ करें?</string>
+    <string name="settings_clear_cache_message">अस्थायी फ़ाइलें और कैश किया गया डेटा हटा दिया जाएगा। आपकी सहेजी गई PDF प्रभावित नहीं होंगी।</string>
+    <string name="settings_cache_cleared">अस्थायी डेटा साफ़ किया गया।</string>
+    <string name="settings_about_title">PDF Wala के बारे में</string>
+    <string name="settings_about_description">PDF Wala PDF दस्तावेज़ बनाने, संपादित करने, कन्वर्ट करने और व्यवस्थित करने के लिए एक ऑफ़लाइन टूलकिट है।</string>
+    <string name="settings_about_features">सुविधाएँ</string>
+    <string name="settings_about_feature_1">PDF मर्ज, विभाजित और संपीड़ित करें</string>
+    <string name="settings_about_feature_2">PDF और इमेज को अलग-अलग फ़ॉर्मेट में कन्वर्ट करें</string>
+    <string name="settings_about_feature_3">वॉटरमार्क, एनोटेशन और हस्ताक्षर जोड़ें</string>
+    <string name="settings_about_feature_4">दस्तावेज़ स्कैन करें और टेक्स्ट पहचानें</string>
+    <string name="settings_about_feature_5">पासवर्ड से PDF सुरक्षित करें</string>
+    <string name="settings_about_made_with">बनाया गया है</string>
+    <string name="settings_about_kotlin_compose">Kotlin &amp; Jetpack Compose</string>
+    <string name="settings_made_with_love">PDF का काम आसान बनाने के लिए ❤️ से बनाया गया</string>
+    <string name="settings_copyright">© %1$d %2$s</string>
+    <string name="settings_select_language">भाषा चुनें</string>
+    <string name="settings_language_changed">भाषा अपडेट की गई</string>
+    <string name="language_english">अंग्रेज़ी</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_hindi">हिन्दी</string>
+    <string name="language_chinese">中文</string>
+    <string name="language_portuguese">Português (Brasil)</string>
+    <string name="language_german">Deutsch</string>
+    <string name="theme_light">लाइट</string>
+    <string name="theme_dark">डार्क</string>
+    <string name="theme_system">सिस्टम डिफ़ॉल्ट</string>
+    <string name="theme_light_desc">हमेशा लाइट मोड इस्तेमाल करें</string>
+    <string name="theme_dark_desc">हमेशा डार्क मोड इस्तेमाल करें</string>
+    <string name="theme_system_desc">अपने डिवाइस की थीम इस्तेमाल करें</string>
+    <string name="settings_no_languages_found">कोई मिलती-जुलती भाषा नहीं मिली</string>
+
+    <!-- Image formats -->
+    <string name="image_format_webp">WebP (अनुशंसित)</string>
+    <string name="image_format_jpeg">JPEG</string>
+    <string name="image_format_webp_desc">अच्छी इमेज गुणवत्ता के साथ छोटा फ़ाइल आकार</string>
+    <string name="image_format_jpeg_desc">व्यापक रूप से समर्थित इमेज फ़ॉर्मेट</string>
+
+    <!-- Feature requests & bug reports -->
+    <string name="feature_request_title">सुविधा सुझाएँ</string>
+    <string name="feature_request_description">PDF Wala के लिए कोई सुझाव है? हमें बताएँ कि हम ऐप को कैसे बेहतर बना सकते हैं।</string>
+    <string name="feature_request_category">श्रेणी</string>
+    <string name="feature_request_category_feature">नई सुविधा</string>
+    <string name="feature_request_category_improvement">सुधार</string>
+    <string name="feature_request_category_ui">UI/UX</string>
+    <string name="feature_request_category_other">अन्य</string>
+    <string name="feature_request_idea">आपका सुझाव</string>
+    <string name="feature_request_placeholder">आप PDF Wala से क्या करवाना चाहेंगे?</string>
+    <string name="bug_report_subject">[PDF Wala] समस्या की रिपोर्ट</string>
+    <string name="bug_report_template">समस्या:
+[समस्या का विवरण दें]
+
+दोहराने के चरण:
+1.
+2.
+3.
+
+अपेक्षित परिणाम:
+[क्या होना चाहिए था?]
+
+वास्तविक परिणाम:
+[इसके बजाय क्या हुआ?]</string>
+
+    <!-- Errors & success -->
+    <string name="error_gmail_required">Gmail आवश्यक है। Gmail इंस्टॉल करें या %s पर फ़ीडबैक भेजें</string>
+    <string name="error_generic">कुछ गलत हो गया। कृपया फिर से प्रयास करें।</string>
+    <string name="error_file_not_found">चयनित फ़ाइल नहीं मिली</string>
+    <string name="error_invalid_pdf">यह PDF अमान्य है या खोली नहीं जा सकी</string>
+    <string name="error_cannot_create_output">आउटपुट फ़ाइल नहीं बनाई जा सकी</string>
+    <string name="error_merge_failed">चयनित PDF को मर्ज नहीं किया जा सका</string>
+    <string name="error_compress_failed">यह PDF संपीड़ित नहीं की जा सकी</string>
+    <string name="error_split_failed">यह PDF विभाजित नहीं की जा सकी</string>
+    <string name="success_operation_complete">हो गया। कार्रवाई सफलतापूर्वक पूरी हुई।</string>
+    <string name="success_file_saved">फ़ाइल सहेजी गई।</string>
+
+    <!-- File picker & empty states -->
+    <string name="file_picker_select_pdfs">PDF चुनें</string>
+    <string name="file_picker_select_images">इमेज चुनें</string>
+    <string name="empty_no_files">कोई फ़ाइल चयनित नहीं</string>
+    <string name="empty_no_pdfs">कोई PDF चयनित नहीं</string>
+    <string name="empty_no_images">कोई इमेज चयनित नहीं</string>
+    <string name="empty_add_files">शुरू करने के लिए फ़ाइलें जोड़ें</string>
+
+    <!-- Metadata -->
+    <string name="metadata_no_pdf_selected_subtitle">इसके गुण देखने के लिए PDF चुनें</string>
+    <string name="metadata_pages_and_size">%1$d पृष्ठ • %2$s</string>
+    <string name="metadata_strip_banner_title">दस्तावेज़ का मेटाडेटा हटाएँ</string>
+    <string name="metadata_strip_banner_subtitle">फ़ाइल साझा करने से पहले छिपी हुई दस्तावेज़ जानकारी हटाएँ।</string>
+    <string name="metadata_strip_all">सभी हटाएँ</string>
+    <string name="metadata_basic_title">मूल गुण</string>
+    <string name="metadata_keywords_placeholder">कीवर्ड को कॉमा से अलग करें</string>
+    <string name="metadata_not_set">निर्दिष्ट नहीं</string>
+    <string name="metadata_advanced_properties">उन्नत गुण</string>
+    <string name="metadata_unknown">उपलब्ध नहीं</string>
+    <string name="metadata_updating_progress">दस्तावेज़ के गुण अपडेट किए जा रहे हैं…</string>
+    <string name="metadata_updated_success">दस्तावेज़ के गुण अपडेट किए गए।</string>
+    <string name="metadata_update_failed">दस्तावेज़ के गुण अपडेट नहीं किए जा सके</string>
+    <string name="metadata_stripping_failed">मेटाडेटा हटाया नहीं जा सका</string>
+    <string name="metadata_cannot_create_output">आउटपुट फ़ाइल नहीं बनाई जा सकी</string>
+    <string name="metadata_saved_to">दस्तावेज़ के गुण अपडेट किए गए।
 
 यहाँ सहेजा गया: %2$s</string>
-    <string name="metadata_stripped_saved_to">गोपनीयता के लिए सभी मेटाडेटा सफलतापूर्वक हटा दिए गए।
+    <string name="metadata_stripped_saved_to">सारा मेटाडेटा हटा दिया गया।
 
 यहाँ सहेजा गया: %1$s</string>
-    <string name="action_select_pdf">PDF चुनें</string>
-    <string name="action_save_changes">परिवर्तन सहेजें</string>
-    <string name="action_select_another_pdf">दूसरी PDF चुनें</string>
     <string name="metadata_update_complete">अपडेट पूरा हुआ</string>
 
-    <!-- Scan to PDF Screen additions -->
+    <!-- Scan to PDF -->
     <string name="scan_add_images">इमेज जोड़ें</string>
     <string name="scan_camera">कैमरा</string>
     <string name="scan_gallery">गैलरी</string>
     <string name="scan_pages_count">पृष्ठ (%1$d)</string>
-    <string name="action_crop">क्रॉप करें</string>
-    <string name="scan_page_size">पृष्ठ आकार</string>
+    <string name="scan_page_size">पृष्ठ का आकार</string>
     <string name="scan_color_mode">रंग मोड</string>
-    <string name="scan_enhance_contrast">कंट्रास्ट बढ़ाएं</string>
-    <string name="scan_creating_pdf">PDF बनाया जा रहा है... %1$d%%</string>
-    <string name="scan_pdf_created">PDF बन गया!</string>
-    <string name="scan_pages_scanned">%1$d पृष्ठ</string>
-    <string name="scan_create_pdf">PDF बनाएं</string>
-    <string name="scan_more_documents">और दस्तावेज़ स्कैन करें</string>
-    <string name="cd_capture">फोटो लें</string>
+    <string name="scan_enhance_contrast">कॉन्ट्रास्ट बढ़ाएँ</string>
+    <string name="scan_creating_pdf">PDF बनाई जा रही है… %1$d%%</string>
+    <string name="scan_pdf_created">PDF बनाई गई</string>
+    <string name="scan_pages_scanned">%1$d पृष्ठ स्कैन किए गए</string>
+    <string name="scan_create_pdf">PDF बनाएँ</string>
+    <string name="scan_more_documents">और पृष्ठ स्कैन करें</string>
 
-    <!-- Group 1 additions (Annotation, OCR, Watermark, Security, Sign) -->
-    <string name="annotate_title">PDF में टिप्पणी जोड़ें</string>
-    <string name="annotate_no_pdf_subtitle">टिप्पणियां जोड़ने के लिए एक PDF फ़ाइल चुनें</string>
-    <string name="label_stamp_type">स्टैम्प प्रकार</string>
-    <string name="label_width">चौड़ाई</string>
-    <string name="label_height">ऊंचाई</string>
-    <string name="action_add_annotation">टिप्पणी जोड़ें</string>
-    <string name="ocr_title">OCR - टेक्स्ट निकालें</string>
-    <string name="ocr_no_pdf_subtitle">OCR के साथ टेक्स्ट निकालने के लिए एक PDF फ़ाइल चुनें</string>
-    <string name="ocr_markdown_view">मार्कडाउन दृश्य</string>
-    <string name="ocr_raw_text">मूल टेक्स्ट</string>
-    <string name="ocr_reader_title">निकाले गए दस्तावेज़ का रीडर</string>
+    <!-- Annotate PDF -->
+    <string name="annotate_title">PDF में एनोटेशन करें</string>
+    <string name="annotate_no_pdf_subtitle">एनोटेशन जोड़ने के लिए PDF चुनें</string>
+    <string name="annotate_add_another">एक और एनोटेशन जोड़ें</string>
+    <string name="annotate_progress">एनोटेशन लागू किए जा रहे हैं… %1$d%%</string>
+    <string name="annotate_save_pdf">एनोटेशन वाली PDF सहेजें</string>
+    <string name="annotate_another_pdf">किसी अन्य PDF में एनोटेशन करें</string>
+
+    <!-- OCR -->
+    <string name="ocr_title">टेक्स्ट पहचानें (OCR)</string>
+    <string name="ocr_no_pdf_subtitle">OCR से टेक्स्ट पहचानने के लिए PDF चुनें</string>
+    <string name="ocr_markdown_view">Markdown</string>
+    <string name="ocr_raw_text">सादा टेक्स्ट</string>
+    <string name="ocr_reader_title">पहचाना गया टेक्स्ट</string>
+    <string name="ocr_progress">टेक्स्ट पहचाना जा रहा है… %1$d%%</string>
+    <string name="ocr_process_another">किसी अन्य PDF पर प्रक्रिया चलाएँ</string>
+
+    <!-- Watermark -->
     <string name="watermark_title">वॉटरमार्क जोड़ें</string>
-    <string name="watermark_no_pdf_subtitle">वॉटरमार्क जोड़ने के लिए एक PDF फ़ाइल चुनें</string>
+    <string name="watermark_no_pdf_subtitle">वॉटरमार्क जोड़ने के लिए PDF चुनें</string>
     <string name="watermark_label_text">वॉटरमार्क टेक्स्ट</string>
-    <string name="watermark_label_opacity">पारदर्शिता</string>
+    <string name="watermark_label_opacity">अपारदर्शिता</string>
     <string name="watermark_label_rotation">घुमाव</string>
-    <string name="security_title">PDF सुरक्षित करें</string>
-    <string name="security_no_pdf_subtitle">पासवर्ड सेट करने के लिए एक PDF फ़ाइल चुनें</string>
-    <string name="security_confirm_password">पासवर्ड की पुष्टि करें</string>
-    <string name="security_allow_printing">प्रिंटिंग की अनुमति दें</string>
-    <string name="security_allow_copying">कॉपी करने की अनुमति दें</string>
-    <string name="security_allow_editing">संपादन की अनुमति दें</string>
-    <string name="sign_title">PDF पर हस्ताक्षर करें</string>
-    <string name="sign_no_pdf_subtitle">हस्ताक्षर करने के लिए एक PDF फ़ाइल चुनें</string>
-    <string name="sign_add_date">तारीख जोड़ें</string>
-    <string name="sign_add_name">नाम जोड़ें</string>
-    <string name="sign_your_name">आपका नाम</string>
-
-    <!-- Group 2 additions (Convert, ImageTools, Split, HistorySidebar) -->
-    <string name="convert_title">इमेज से PDF</string>
-    <string name="convert_no_images_subtitle">PDF दस्तावेज़ बनाने के लिए इमेज चुनें</string>
-    <string name="action_add_more_images">और इमेज जोड़ें</string>
-    <string name="imgtools_title">इमेज उपकरण</string>
-    <string name="imgtools_custom_size">कस्टम आकार का उपयोग करें</string>
-    <string name="imgtools_aspect_ratio">एस्पेक्ट रेशियो बनाए रखें</string>
-    <string name="imgtools_target_resolution">लक्षित रिज़ॉल्यूशन</string>
-    <string name="split_no_pdf_subtitle">अलग दस्तावेजों में विभाजित करने के लिए एक PDF फ़ाइल चुनें</string>
-    <string name="history_title">इतिहास</string>
-    <string name="history_empty_title">कोई हालिया इतिहास नहीं</string>
-    <string name="history_empty_subtitle">संसाधित दस्तावेज़ यहां दिखाई देंगे</string>
-    <string name="history_clear_all">इतिहास साफ़ करें</string>
-    <string name="history_clear_dialog_title">इतिहास साफ़ करें?</string>
-    <string name="history_clear_dialog_message">यह आपके इतिहास से सभी प्रविष्टियों को हटा देगा।</string>
-    <string name="history_view_all_files">सभी %1$d फ़ाइलें देखें</string>
-    <string name="history_open_file">फ़ाइल खोलें</string>
-    <string name="history_open_gallery">गैलरी खोलें</string>
-
-    <!-- Group 3 additions (FillForms, HtmlToPdf, PdfToImage, Flatten, Organize, Rotate) -->
-    <string name="fill_title">PDF फॉर्म भरें</string>
-    <string name="fill_no_pdf_subtitle">फ़ील्ड भरने के लिए एक PDF फॉर्म चुनें</string>
-    <string name="fill_analyzing_fields">फॉर्म फ़ील्ड का विश्लेषण किया जा रहा है...</string>
-    <string name="fill_filling_form">फॉर्म भरा जा रहा है... %1$d%%</string>
-    <string name="fill_save_filled">भरा हुआ फॉर्म सहेजें</string>
-    <string name="fill_another_form">एक और फॉर्म भरें</string>
-    <string name="html_title">HTML से PDF</string>
-    <string name="html_from_url">URL से</string>
-    <string name="html_from_html">HTML से</string>
-    <string name="html_website_url">वेबसाइट URL</string>
-    <string name="html_content_label">HTML सामग्री</string>
-    <string name="html_basic_template">बुनियादी</string>
-    <string name="html_invoice_template">इनवॉइस</string>
-    <string name="pdf2img_title">PDF से इमेज</string>
-    <string name="pdf2img_no_pdf_subtitle">पृष्ठों को इमेज में बदलने के लिए एक PDF फ़ाइल चुनें</string>
-    <string name="action_ok">ठीक है</string>
-    <string name="flatten_title">PDF फ़्लैटन करें</string>
-    <string name="flatten_no_pdf_subtitle">टिप्पणियों और फॉर्म फ़ील्ड को फ़्लैटन करने के लिए एक PDF फ़ाइल चुनें</string>
-    <string name="flatten_progress">PDF फ़्लैटन किया जा रहा है... %1$d%%</string>
-    <string name="flatten_another_pdf">एक और PDF फ़्लैटन करें</string>
-    <string name="organize_title">पृष्ठ व्यवस्थित करें</string>
-    <string name="organize_no_pdf_subtitle">पृष्ठों को हटाने या पुनर्व्यवस्थित करने के लिए एक PDF चुनें</string>
-    <string name="organize_remove_pages">पृष्ठ हटाएं</string>
-    <string name="organize_reorder_pages">पृष्ठ निकालें/पुनर्व्यवस्थित करें</string>
-    <string name="action_select_all">सभी</string>
-    <string name="action_select_none">कोई नहीं</string>
-    <string name="rotate_title">पृष्ठ घुमाएं</string>
-    <string name="rotate_no_pdf_subtitle">पृष्ठों को घुमाने के लिए एक PDF फ़ाइल चुनें</string>
-    <string name="rotate_all_pages">सभी पृष्ठ</string>
-    <string name="rotate_select_pages">पृष्ठ चुनें</string>
-
-    <!-- Group 4 additions (Files, Compress, Repair, Extract, PageNumber, Licenses) -->
-    <string name="files_clear_dialog_title">हालिया फ़ाइलें साफ़ करें?</string>
-    <string name="files_clear_dialog_message">यह आपके इतिहास से सभी फ़ाइलों को हटा देगा। वास्तविक फ़ाइलें नहीं हटाई जाएंगी।</string>
-    <string name="compress_no_pdf_subtitle">आकार घटाने के लिए एक PDF फ़ाइल चुनें</string>
-    <string name="action_share_all">सभी शेयर करें</string>
-    <string name="repair_title">PDF मरम्मत करें</string>
-    <string name="repair_no_pdf_subtitle">जांच और मरम्मत के लिए एक PDF चुनें</string>
-    <string name="repair_analyzing_structure">PDF संरचना का विश्लेषण किया जा रहा है...</string>
-    <string name="extract_title">टेक्स्ट निकालें</string>
-    <string name="extract_no_pdf_subtitle">टेक्स्ट सामग्री निकालने के लिए एक PDF चुनें</string>
-    <string name="pagenum_title">पृष्ठ संख्याएं</string>
-    <string name="pagenum_no_pdf_subtitle">पृष्ठ संख्याएं जोड़ने के लिए एक PDF चुनें</string>
-    <string name="licenses_title">ओपन सोर्स लाइसेंस</string>
-    <string name="cd_open_link">लिंक खोलें</string>
-
-    <!-- Pass 2 additions -->
-    <string name="security_password_info">PDF खोलने के लिए इस पासवर्ड की आवश्यकता होगी</string>
-    <string name="security_reenter_password">पासवर्ड पुनः दर्ज करें</string>
-    <string name="security_passwords_mismatch">पासवर्ड मेल नहीं खाते</string>
-    <string name="cd_toggle_visibility">दृश्यता बदलें</string>
-    <string name="sign_another_pdf">एक और PDF पर हस्ताक्षर करें</string>
-    <string name="convert_no_images_title">कोई इमेज चयनित नहीं</string>
-    <string name="action_move_first">पहला</string>
-    <string name="action_move_last">अंतिम</string>
-    <string name="imgtools_target_format">लक्षित प्रारूप</string>
-    <string name="split_switch_mode">मोड बदलें</string>
-    <string name="split_all_pages_title">PDF विभाजित करें - सभी पृष्ठ</string>
-    <string name="split_placeholder">उदा., 1, 3, 5-8, 10</string>
-    <string name="action_change">बदलें</string>
-    <string name="action_reset">रीसेट</string>
-
-    <!-- Final cleanup additions -->
-    <string name="annotate_add_another">एक और टिप्पणी जोड़ें</string>
-    <string name="ocr_progress">OCR से प्रोसेसिंग जारी... %1$d%%</string>
-    <string name="ocr_process_another">एक और PDF प्रोसेस करें</string>
     <string name="watermark_font_size">फ़ॉन्ट आकार: %1$d</string>
     <string name="watermark_image_selected">इमेज चयनित</string>
     <string name="watermark_select_image">इमेज चुनें</string>
-    <string name="watermark_opacity_val">पारदर्शिता: %1$d%%</string>
+    <string name="watermark_opacity_val">अपारदर्शिता: %1$d%%</string>
     <string name="watermark_rotation_val">घुमाव: %1$d°</string>
-    <string name="watermark_progress">वॉटरमार्क जोड़ा जा रहा है... %1$d%%</string>
-    <string name="watermark_another_pdf">एक और PDF पर वॉटरमार्क जोड़ें</string>
-    <string name="sign_progress">हस्ताक्षर जोड़ा जा रहा है... %1$d%%</string>
+    <string name="watermark_progress">वॉटरमार्क जोड़ा जा रहा है… %1$d%%</string>
+    <string name="watermark_another_pdf">किसी अन्य PDF में वॉटरमार्क जोड़ें</string>
 
-    <!-- Last few additions -->
-    <string name="annotate_progress">टिप्पणियां लागू की जा रही हैं... %1$d%%</string>
-    <string name="annotate_save_pdf">टिप्पणी वाला PDF सहेजें</string>
-    <string name="annotate_another_pdf">एक और PDF में टिप्पणी जोड़ें</string>
+    <!-- Security -->
+    <string name="security_title">PDF सुरक्षित करें</string>
+    <string name="security_no_pdf_subtitle">PDF चुनें और उसे सुरक्षित करने के लिए पासवर्ड सेट करें</string>
+    <string name="security_confirm_password">पासवर्ड की पुष्टि करें</string>
+    <string name="security_allow_printing">प्रिंट करने की अनुमति दें</string>
+    <string name="security_allow_copying">कॉपी करने की अनुमति दें</string>
+    <string name="security_allow_editing">संपादन की अनुमति दें</string>
+    <string name="security_password_info">सुरक्षित PDF खोलने पर हर बार आपको इस पासवर्ड की आवश्यकता होगी</string>
+    <string name="security_reenter_password">पासवर्ड फिर से दर्ज करें</string>
+    <string name="security_passwords_mismatch">दोनों पासवर्ड मेल नहीं खाते</string>
 
-    <!-- Fix missing keys additions -->
-    <string name="label_page_number">पृष्ठ संख्या</string>
-    <string name="label_color">रंग</string>
-    <string name="split_from">से</string>
-    <string name="split_to">तक</string>
-    <string name="split_page_numbers">पृष्ठ संख्याएं</string>
+    <!-- Sign PDF -->
+    <string name="sign_title">PDF पर हस्ताक्षर करें</string>
+    <string name="sign_no_pdf_subtitle">अपना हस्ताक्षर जोड़ने के लिए PDF चुनें</string>
+    <string name="sign_add_date">तारीख शामिल करें</string>
+    <string name="sign_add_name">नाम शामिल करें</string>
+    <string name="sign_your_name">नाम</string>
+    <string name="sign_another_pdf">किसी अन्य PDF पर हस्ताक्षर करें</string>
+    <string name="sign_progress">हस्ताक्षर जोड़ा जा रहा है… %1$d%%</string>
+
+    <!-- Images to PDF -->
+    <string name="convert_title">इमेज से PDF</string>
+    <string name="convert_no_images_subtitle">PDF बनाने के लिए इमेज चुनें</string>
+    <string name="convert_no_images_title">कोई इमेज चयनित नहीं</string>
+
+    <!-- Image tools -->
+    <string name="imgtools_title">इमेज टूल</string>
+    <string name="imgtools_custom_size">कस्टम आकार</string>
+    <string name="imgtools_aspect_ratio">आस्पेक्ट रेशियो बनाए रखें</string>
+    <string name="imgtools_target_resolution">आउटपुट रिज़ॉल्यूशन</string>
+    <string name="imgtools_target_format">आउटपुट फ़ॉर्मेट</string>
+
+    <!-- History -->
+    <string name="history_title">इतिहास</string>
+    <string name="history_empty_title">अभी कोई इतिहास नहीं</string>
+    <string name="history_empty_subtitle">आप जिन फ़ाइलों पर प्रक्रिया चलाएँगे, वे यहाँ दिखाई देंगी</string>
+    <string name="history_clear_all">इतिहास साफ़ करें</string>
+    <string name="history_clear_dialog_title">इतिहास साफ़ करें?</string>
+    <string name="history_clear_dialog_message">इतिहास की सभी प्रविष्टियाँ हटा दी जाएँगी।</string>
+    <string name="history_view_all_files">सभी %1$d फ़ाइलें देखें</string>
+    <string name="history_open_file">फ़ाइल खोलें</string>
+    <string name="history_open_gallery">गैलरी खोलें</string>
+    <plurals name="history_output_files">
+        <item quantity="one">(%d फ़ाइल)</item>
+        <item quantity="other">(%d फ़ाइलें)</item>
+    </plurals>
+
+    <!-- Fill PDF forms -->
+    <string name="fill_title">PDF फ़ॉर्म भरें</string>
+    <string name="fill_no_pdf_subtitle">भरने के लिए PDF फ़ॉर्म चुनें</string>
+    <string name="fill_analyzing_fields">फ़ॉर्म फ़ील्ड जाँची जा रही हैं…</string>
+    <string name="fill_filling_form">फ़ॉर्म अपडेट किया जा रहा है… %1$d%%</string>
+    <string name="fill_save_filled">भरा हुआ फ़ॉर्म सहेजें</string>
+    <string name="fill_another_form">कोई अन्य फ़ॉर्म भरें</string>
     <string name="fill_select_pdf">PDF फ़ॉर्म चुनें</string>
-    <string name="fill_no_form_fields_found">कोई फ़ॉर्म फ़ील्ड नहीं मिला</string>
-    <string name="fill_no_fillable_fields_found">इस PDF में भरने योग्य फ़ॉर्म फ़ील्ड नहीं हैं।</string>
-    <string name="fill_fields_found">%1$d भरने योग्य फ़ील्ड मिले</string>
+    <string name="fill_no_form_fields_found">कोई फ़ॉर्म फ़ील्ड नहीं मिली</string>
+    <string name="fill_no_fillable_fields_found">इस PDF में भरने योग्य कोई फ़ील्ड नहीं है।</string>
+    <string name="fill_fields_found">%1$d भरने योग्य फ़ील्ड मिलीं</string>
     <string name="fill_form_fields_title">फ़ॉर्म फ़ील्ड</string>
-    <string name="fill_flatten_after_filling">भरने के बाद फ़्लैट करें</string>
-    <string name="fill_make_non_editable">फ़ील्ड को संपादन योग्य न बनाएं</string>
-    <string name="fill_form_filled">फ़ॉर्म भर गया!</string>
-    <string name="fill_fields_updated">%1$d फ़ील्ड अपडेट किए गए</string>
+    <string name="fill_flatten_after_filling">भरने के बाद फ़ॉर्म फ़्लैटन करें</string>
+    <string name="fill_make_non_editable">फ़ील्ड को केवल-पढ़ने योग्य बनाएँ</string>
+    <string name="fill_form_filled">फ़ॉर्म पूरा हुआ</string>
+    <string name="fill_fields_updated">%1$d फ़ील्ड अपडेट की गईं</string>
     <string name="fill_no_editable_fields">इस फ़ॉर्म में कोई संपादन योग्य फ़ील्ड नहीं है</string>
+
+    <!-- HTML to PDF -->
+    <string name="html_title">HTML से PDF</string>
+    <string name="html_from_url">वेब पता</string>
+    <string name="html_website_url">वेबसाइट पता</string>
+    <string name="html_content_label">HTML सामग्री</string>
+    <string name="html_basic_template">बेसिक</string>
+    <string name="html_invoice_template">इनवॉइस</string>
+
+    <!-- PDF to images -->
+    <string name="pdf2img_title">PDF से इमेज</string>
+    <string name="pdf2img_no_pdf_subtitle">पृष्ठों को इमेज में बदलने के लिए PDF चुनें</string>
+    <string name="pdf2img_size">आकार: %1$s</string>
+    <string name="pdf2img_output_format">आउटपुट फ़ॉर्मेट</string>
+    <string name="pdf2img_resolution">रिज़ॉल्यूशन (DPI)</string>
+    <string name="pdf2img_resolution_fast">72 (तेज़)</string>
+    <string name="pdf2img_resolution_hd">300 (HD)</string>
+    <string name="pdf2img_gallery_info">इमेज आपके डिवाइस की गैलरी (Pictures/PDF Wala फ़ोल्डर) में सहेजी जाएँगी।</string>
+    <string name="pdf2img_progress">पृष्ठों को इमेज में बदला जा रहा है…</string>
+    <string name="pdf2img_convert_action">इमेज में बदलें</string>
+    <string name="convert_complete">रूपांतरण पूरा हुआ</string>
+    <string name="convert_failed">रूपांतरण विफल रहा</string>
+    <string name="pdf2img_saved_count">%1$d इमेज आपकी गैलरी (Pictures/PDF Wala) में सफलतापूर्वक सहेजी गईं</string>
+    <string name="pdf2img_history_details">%1$d %2$s इमेज में बदला गया</string>
+
+    <!-- Flatten PDF -->
+    <string name="flatten_title">PDF फ़्लैटन करें</string>
+    <string name="flatten_no_pdf_subtitle">एनोटेशन और फ़ॉर्म फ़ील्ड फ़्लैटन करने के लिए PDF चुनें</string>
+    <string name="flatten_progress">PDF फ़्लैटन की जा रही है… %1$d%%</string>
+    <string name="flatten_another_pdf">किसी अन्य PDF को फ़्लैटन करें</string>
+
+    <!-- Organize pages -->
+    <string name="organize_title">पृष्ठ व्यवस्थित करें</string>
+    <string name="organize_no_pdf_subtitle">पृष्ठ हटाने या उनका क्रम बदलने के लिए PDF चुनें</string>
+    <string name="organize_remove_pages">पृष्ठ हटाएँ</string>
+    <string name="organize_reorder_pages">पृष्ठों का क्रम बदलें</string>
+
+    <!-- Rotate pages -->
+    <string name="rotate_title">पृष्ठ घुमाएँ</string>
+    <string name="rotate_no_pdf_subtitle">पृष्ठ घुमाने के लिए PDF चुनें</string>
+    <string name="rotate_all_pages">सभी पृष्ठ</string>
+    <string name="rotate_select_pages">पृष्ठ चुनें</string>
+
+    <!-- Repair PDF -->
+    <string name="repair_title">PDF सुधारें</string>
+    <string name="repair_no_pdf_subtitle">सामान्य समस्याओं की जाँच करने के लिए PDF चुनें</string>
+    <string name="repair_analyzing_structure">PDF संरचना जाँची जा रही है…</string>
+
+    <!-- Extract text -->
+    <string name="extract_title">टेक्स्ट निकालें</string>
+    <string name="extract_no_pdf_subtitle">टेक्स्ट निकालने के लिए PDF चुनें</string>
+    <string name="extract_pages_count">%1$d पृष्ठ निकालें</string>
+    <string name="extract_details_count">%1$d पृष्ठ निकाले गए</string>
+    <string name="select_pages_count">पृष्ठ चुनें (%1$d में से %2$d)</string>
+    <string name="extract_success_count">%1$d पृष्ठ सफलतापूर्वक निकाले गए</string>
+    <string name="extract_failed">पृष्ठ निकालने में विफल</string>
+    <string name="extraction_complete">पृष्ठ निकालना पूरा हुआ</string>
+    <string name="extract_pages_select_subtitle">विशिष्ट पृष्ठ निकालने के लिए PDF फ़ाइल चुनें</string>
+    <string name="extracting_pages">पृष्ठ निकाले जा रहे हैं…</string>
+
+    <!-- Page numbers -->
+    <string name="pagenum_title">पृष्ठ संख्या जोड़ें</string>
+    <string name="pagenum_no_pdf_subtitle">पृष्ठ संख्या जोड़ने के लिए PDF चुनें</string>
+
+    <!-- Licenses -->
+    <string name="licenses_title">ओपन-सोर्स लाइसेंस</string>
+
+    <!-- Files -->
+    <string name="files_clear_dialog_title">हाल की फ़ाइलें साफ़ करें?</string>
+    <string name="files_clear_dialog_message">हाल की फ़ाइलों की प्रविष्टियाँ हटा दी जाएँगी। आपकी मूल फ़ाइलें डिलीट नहीं होंगी।</string>
+    <string name="files_subtitle">अपने हाल के दस्तावेज़ देखें</string>
+    <string name="files_open_pdf_title">PDF दस्तावेज़ खोलें</string>
+    <string name="files_open_pdf_subtitle">PDF फ़ाइलें ब्राउज़ करें और खोलें</string>
+    <string name="files_recent_title">हाल की फ़ाइलें</string>
+    <string name="files_no_recent_title">कोई हाल की फ़ाइल नहीं</string>
+    <string name="files_no_recent_subtitle">कोई दस्तावेज़ खोलें, वह यहाँ दिखाई देगा</string>
+
+    <!--    Other-->
+    <string name="annotate_source_pdf">स्रोत PDF</string>
+    <string name="annotate_type">एनोटेशन प्रकार</string>
+    <string name="annotate_annotations_count">एनोटेशन (%1$d)</string>
+    <string name="annotation_type_highlight">हाइलाइट</string>
+    <string name="annotation_type_underline">अंडरलाइन</string>
+    <string name="annotation_type_strikethrough">स्ट्राइकथ्रू</string>
+    <string name="annotation_type_sticky_note">स्टिकी नोट</string>
+    <string name="annotation_type_text_box">टेक्स्ट बॉक्स</string>
+    <string name="annotation_type_rectangle">आयत</string>
+    <string name="annotation_type_circle">वृत्त</string>
+    <string name="annotation_type_arrow">तीर</string>
+    <string name="annotation_type_stamp">स्टैम्प</string>
+    <string name="selected_pdf">चयनित PDF</string>
+    <string name="annotate_item_details">%1$d. %2$s (पृष्ठ %3$d)</string>
+    <string name="annotation_type_freehand_drawing">फ्रीहैंड ड्रॉइंग</string>
+    <string name="annotation_type_line">रेखा</string>
+    <string name="annotate_success_title">एनोटेशन लागू किए गए</string>
+    <string name="annotate_success_count">%1$d एनोटेशन जोड़े गए</string>
+    <string name="convert_selected_images_count">चयनित इमेज (%1$d)</string>
+    <string name="convert_order_modified">क्रम बदला गया</string>
+    <string name="convert_image_quality">इमेज गुणवत्ता</string>
+    <string name="convert_progress">इमेज को PDF में बदला जा रहा है…</string>
+    <string name="convert_select_images">इमेज चुनें</string>
+    <string name="convert_to_pdf">PDF में बदलें</string>
+    <string name="convert_original_position">पहले %1$d था</string>
+    <string name="convert_success_message">%1$d इमेज को सफलतापूर्वक PDF में बदला गया</string>
+    <string name="convert_success_saved_to">%1$d इमेज को सफलतापूर्वक PDF में बदला गया\n\nयहाँ सहेजा गया: %2$s/%3$s</string>
+    <string name="convert_history_details">%1$d इमेज को PDF में बदला गया</string>
+
+    <!-- Extract Text -->
+    <string name="extract_analyzing">PDF का विश्लेषण किया जा रहा है…</string>
+    <string name="extract_text_found">टेक्स्ट मिला</string>
+    <string name="extract_no_text_detected">कोई टेक्स्ट नहीं मिला</string>
+    <string name="extract_checking">जाँच की जा रही है…</string>
+    <string name="extract_scanned_pdf">यह स्कैन किया हुआ PDF लगता है। इसके लिए OCR की आवश्यकता होगी।</string>
+    <string name="extract_preview">प्रीव्यू</string>
+    <string name="extract_options">विकल्प</string>
+    <string name="extract_add_page_breaks">पृष्ठ विराम जोड़ें</string>
+    <string name="extract_page_breaks_description">पृष्ठों के बीच मार्कर जोड़ें</string>
+    <string name="extract_progress">टेक्स्ट निकाला जा रहा है…</string>
+    <string name="extract_to_text_file">टेक्स्ट फ़ाइल में निकालें</string>
+    <string name="extract_complete">टेक्स्ट निकालना पूरा हुआ</string>
+    <string name="extract_success_message">टेक्स्ट सफलतापूर्वक निकाला गया!\n\nअक्षर: %1$d\nशब्द: %2$d\nपृष्ठ: %3$d</string>
 </resources>

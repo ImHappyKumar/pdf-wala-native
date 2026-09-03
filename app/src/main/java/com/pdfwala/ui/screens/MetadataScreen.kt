@@ -286,7 +286,7 @@ fun MetadataScreen(
                     selectedFile == null -> {
                         EmptyState(
                             icon = Icons.Default.Info,
-                            title = stringResource(R.string.metadata_no_pdf_selected),
+                            title = stringResource(R.string.no_pdf_selected),
                             subtitle = stringResource(R.string.metadata_no_pdf_selected_subtitle),
                             modifier = Modifier.align(Alignment.Center)
                         )
@@ -424,7 +424,7 @@ fun MetadataScreen(
                                             modifier = Modifier.size(18.dp)
                                         )
                                         Spacer(modifier = Modifier.width(4.dp))
-                                        Text(if (isEditing) stringResource(R.string.action_cancel) else stringResource(R.string.action_edit))
+                                        Text(if (isEditing) stringResource(R.string.action_cancel) else stringResource(R.string.cd_edit))
                                     }
                                 }
                             }

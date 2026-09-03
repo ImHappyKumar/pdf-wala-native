@@ -13,7 +13,6 @@ import android.os.Environment
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
@@ -35,8 +34,6 @@ import com.pdfwala.domain.operations.ImageConverter
 import com.pdfwala.domain.operations.ImageFormat
 import com.pdfwala.ui.components.*
 import com.pdfwala.util.FileOpener
-import com.pdfwala.ui.screens.DefaultImageFormat
-import com.pdfwala.ui.screens.SettingsPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -150,7 +147,10 @@ fun PdfToImageScreen(
             result.fold(
                 onSuccess = { _ ->
                     resultSuccess = true
-                    resultMessage = "Successfully saved $savedCount images to your gallery (Pictures/PDF Wala)"
+                    resultMessage = context.getString(
+                        R.string.pdf2img_saved_count,
+                        savedCount
+                    )
                     
                     // Record in history with isImageOutput = true
                     HistoryManager.recordSuccess(
@@ -160,14 +160,19 @@ fun PdfToImageScreen(
                         outputFileUri = uriList.firstOrNull(),
                         outputFileUris = uriList,
                         outputFileName = "${file.name.removeSuffix(".pdf")}_images.${imageFormat.extension}",
-                        details = "Converted to $savedCount ${imageFormat.extension.uppercase()} images",
+                        details = context.getString(
+                            R.string.pdf2img_history_details,
+                            savedCount,
+                            imageFormat.extension.uppercase()
+                        ),
                         isImageOutput = true
                     )
                     selectedFile = null
                 },
                 onFailure = { error ->
                     resultSuccess = false
-                    resultMessage = error.message ?: "Conversion failed"
+                    resultMessage = error.message
+                        ?: context.getString(R.string.pdf2img_conversion_failed)
                     
                     // Record failure
                     HistoryManager.recordFailure(
@@ -191,7 +196,7 @@ fun PdfToImageScreen(
     Scaffold(
         topBar = {
             ToolTopBar(
-                title = stringResource(R.string.tool_pdf_to_images),
+                title = stringResource(R.string.pdf2img_title),
                 onNavigateBack = onNavigateBack
             )
         }
@@ -210,7 +215,7 @@ fun PdfToImageScreen(
                 if (selectedFile == null) {
                     EmptyState(
                         icon = Icons.Default.Image,
-                        title = stringResource(R.string.metadata_no_pdf_selected),
+                        title = stringResource(R.string.no_pdf_selected),
                         subtitle = stringResource(R.string.pdf2img_no_pdf_subtitle),
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -250,7 +255,10 @@ fun PdfToImageScreen(
                                             color = MaterialTheme.colorScheme.onPrimaryContainer
                                         )
                                         Text(
-                                            text = "Size: ${selectedFile!!.formattedSize}",
+                                            text = stringResource(
+                                                R.string.pdf2img_size,
+                                                selectedFile!!.formattedSize
+                                            ),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                                         )
@@ -269,7 +277,7 @@ fun PdfToImageScreen(
                         // Image format selection
                         item {
                             Text(
-                                text = "Output Format",
+                                text = stringResource(R.string.pdf2img_output_format),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -309,7 +317,7 @@ fun PdfToImageScreen(
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
                                         Text(
-                                            text = "Resolution (DPI)",
+                                            text = stringResource(R.string.pdf2img_resolution),
                                             style = MaterialTheme.typography.labelLarge,
                                             fontWeight = FontWeight.Medium
                                         )
@@ -335,12 +343,12 @@ fun PdfToImageScreen(
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
                                         Text(
-                                            text = "72 (Fast)",
+                                            text = stringResource(R.string.pdf2img_resolution_fast),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                         Text(
-                                            text = "300 (HD)",
+                                            text = stringResource(R.string.pdf2img_resolution_hd),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
@@ -370,7 +378,7 @@ fun PdfToImageScreen(
                                     )
                                     Spacer(modifier = Modifier.width(12.dp))
                                     Text(
-                                        text = "Images will be saved to your device's gallery (Pictures/PDF Wala folder).",
+                                        text = stringResource(R.string.pdf2img_gallery_info),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onTertiaryContainer
                                     )
@@ -401,7 +409,7 @@ fun PdfToImageScreen(
                             ) {
                                 OperationProgress(
                                     progress = progress,
-                                    message = "Converting pages to images..."
+                                    message = stringResource(R.string.pdf2img_progress)
                                 )
                             }
                         }
@@ -421,7 +429,7 @@ fun PdfToImageScreen(
                 ) {
                     if (selectedFile == null) {
                         ActionButton(
-                            text = "Select PDF",
+                            text = stringResource(R.string.action_select_pdf),
                             onClick = {
                                 pickPdfLauncher.safeLaunch(arrayOf("application/pdf"), context)
                             },
@@ -429,7 +437,7 @@ fun PdfToImageScreen(
                         )
                     } else {
                         ActionButton(
-                            text = "Convert to Images",
+                            text = stringResource(R.string.pdf2img_convert_action),
                             onClick = { convertPdfToImages() },
                             isLoading = isProcessing,
                             icon = Icons.Default.Image
@@ -452,7 +460,15 @@ fun PdfToImageScreen(
                 )
             },
             title = {
-                Text(if (resultSuccess) "Conversion Complete" else "Conversion Failed")
+                Text(
+                    stringResource(
+                        if (resultSuccess) {
+                            R.string.pdf2img_conversion_complete
+                        } else {
+                            R.string.pdf2img_conversion_failed
+                        }
+                    )
+                )
             },
             text = {
                 Text(resultMessage)
@@ -488,7 +504,7 @@ fun PdfToImageScreen(
     // Multi-output result screen (for multiple images)
     if (showMultiOutputScreen && savedImageUris.isNotEmpty()) {
         MultiOutputResultScreen(
-            title = stringResource(R.string.tool_pdf_to_images),
+            title = stringResource(R.string.pdf2img_title),
             outputUris = savedImageUris,
             isImageOutput = true,
             onNavigateBack = { 

@@ -151,21 +151,22 @@ fun CompressScreen(
                                 if (savedBytes > 0) {
                                     resultSuccess = true
                                     resultUri = cachedUri ?: outputUri
-                                    resultMessage = buildString {
-                                        append("Compression successful!\n\n")
-                                        append("Before: ${file.formattedSize}\n")
-                                        append("After: ${compressedInfo?.formattedSize ?: "Unknown"}\n")
-                                        append("Saved: ${FileManager.formatFileSize(savedBytes)} ($savedPercent%)")
-                                    }
+                                    resultMessage = context.getString(
+                                        R.string.compress_success_message,
+                                        file.formattedSize,
+                                        compressedInfo?.formattedSize ?: context.getString(R.string.label_unknown),
+                                        FileManager.formatFileSize(savedBytes),
+                                        savedPercent
+                                    )
                                 } else {
                                     resultSuccess = true
                                     resultUri = cachedUri ?: outputUri
-                                    resultMessage = buildString {
-                                        append("Compressed PDF saved.\n\n")
-                                        append("Before: ${file.formattedSize}\n")
-                                        append("After: ${compressedInfo?.formattedSize ?: "Unknown"}\n\n")
-                                        append("Note: No size reduction achieved. This PDF likely contains mostly text or vector content, which cannot be compressed further by image optimization. Try a higher compression level or the file may already be at minimum size.")
-                                    }
+                                    resultMessage = context.getString(
+                                        R.string.compress_no_reduction_message,
+                                        file.formattedSize,
+                                        compressedInfo?.formattedSize
+                                            ?: context.getString(R.string.label_unknown)
+                                    )
                                 }
                                 selectedFile = null
                             },
@@ -173,42 +174,45 @@ fun CompressScreen(
                                 if (error is TargetSizeNotReachedException) {
                                     resultSuccess = true
                                     resultUri = copyToViewerCache(context, outputUri) ?: outputUri
-                                    resultMessage = buildString {
-                                        append("Target size not reached.\n\n")
-                                        append("Target: $targetSizeValue $targetSizeUnit\n")
-                                        append("Achieved: ${FileManager.formatFileSize(error.smallestAchievableSize)}\n\n")
-                                        append("Note: The file was compressed to the smallest possible size without destroying its contents.")
-                                    }
+                                    resultMessage = context.getString(
+                                        R.string.compress_target_size_not_reached,
+                                        targetSizeValue,
+                                        targetSizeUnit,
+                                        FileManager.formatFileSize(error.smallestAchievableSize)
+                                    )
                                 } else {
                                     resultSuccess = false
-                                    resultMessage = error.message ?: "Compression failed"
+                                    resultMessage = error.message
+                                        ?: context.getString(R.string.compression_failed)
                                 }
                             }
                         )
                     } else {
                         resultSuccess = false
-                        resultMessage = "Cannot create output file"
+                        resultMessage = context.getString(
+                            R.string.error_cannot_create_output
+                        )
                     }
-                    
+
                     isProcessing = false
                     showResult = true
                 }
             }
         }
     }
-    
+
     // Function to compress with default location
     fun compressWithDefaultLocation() {
         scope.launch {
             isProcessing = true
             progress = 0f
             val originalFile = selectedFile!!
-            
+
             val result = withContext(Dispatchers.IO) {
                 try {
                     val fileName = FileManager.generateOutputFileName("compressed")
                     val outputResult = OutputFolderManager.createOutputStream(context, fileName)
-                    
+
                     if (outputResult != null) {
                         val compressResult = if (compressionMode == CompressionMode.LEVEL) {
                             pdfCompressor.compressPdf(
@@ -233,9 +237,9 @@ fun CompressScreen(
                             )
                         }
 
-                        
+
                         outputResult.outputStream.close()
-                        
+
                         compressResult.fold(
                             onSuccess = { cResult ->
                                 val compressedSize = FileManager.getFileInfo(context, outputResult.outputFile.contentUri)?.size ?: outputResult.outputFile.file.length()
@@ -244,51 +248,83 @@ fun CompressScreen(
                                 val savedPercent = if (originalBytes > 0) {
                                     (savedBytes.toFloat() / originalBytes * 100).toInt()
                                 } else 0
-                                
-                                val message = buildString {
-                                    if (savedBytes > 0) {
-                                        append("Compression successful!\n\n")
-                                        append("Before: ${originalFile.formattedSize}\n")
-                                        append("After: ${FileManager.formatFileSize(compressedSize)}\n")
-                                        append("Saved: ${FileManager.formatFileSize(savedBytes)} ($savedPercent%)\n\n")
-                                    } else {
-                                        append("Compressed PDF saved.\n\n")
-                                        append("Before: ${originalFile.formattedSize}\n")
-                                        append("After: ${FileManager.formatFileSize(compressedSize)}\n\n")
-                                        append("Note: No size reduction achieved. This PDF likely contains mostly text or vector content, which cannot be compressed further by image optimization. Try a higher compression level or the file may already be at minimum size.\n\n")
-                                    }
-                                    append("Saved to: ${OutputFolderManager.getOutputFolderPath(context)}/${outputResult.outputFile.fileName}")
+
+                                val outputPath =
+                                    "${OutputFolderManager.getOutputFolderPath(context)}/${outputResult.outputFile.fileName}"
+
+                                val savedToMessage = context.getString(
+                                    R.string.saved_to,
+                                    outputPath
+                                )
+
+                                val message = if (savedBytes > 0) {
+                                    context.getString(
+                                        R.string.compress_success_message,
+                                        originalFile.formattedSize,
+                                        FileManager.formatFileSize(compressedSize),
+                                        FileManager.formatFileSize(savedBytes),
+                                        savedPercent
+                                    ) + "\n\n" + savedToMessage
+                                } else {
+                                    context.getString(
+                                        R.string.compress_no_reduction_message,
+                                        originalFile.formattedSize,
+                                        FileManager.formatFileSize(compressedSize)
+                                    ) + "\n\n" + savedToMessage
                                 }
                                 Triple(true, message, outputResult.outputFile.contentUri)
                             },
                             onFailure = { error ->
                                 if (error is TargetSizeNotReachedException) {
-                                    val message = buildString {
-                                        append("Target size not reached.\n\n")
-                                        append("Target: $targetSizeValue $targetSizeUnit\n")
-                                        append("Achieved: ${FileManager.formatFileSize(error.smallestAchievableSize)}\n\n")
-                                        append("Note: The file was compressed to the smallest possible size without destroying its contents.\n\n")
-                                        append("Saved to: ${OutputFolderManager.getOutputFolderPath(context)}/${outputResult.outputFile.fileName}")
-                                    }
-                                    Triple(true, message, outputResult.outputFile.contentUri)
+                                    val outputPath =
+                                        "${OutputFolderManager.getOutputFolderPath(context)}/${outputResult.outputFile.fileName}"
+
+                                    val message = context.getString(
+                                        R.string.compress_target_size_not_reached,
+                                        targetSizeValue,
+                                        targetSizeUnit,
+                                        FileManager.formatFileSize(error.smallestAchievableSize)
+                                    ) + "\n\n" + context.getString(
+                                        R.string.saved_to,
+                                        outputPath
+                                    )
+
+                                    Triple(
+                                        true,
+                                        message,
+                                        outputResult.outputFile.contentUri
+                                    )
                                 } else {
                                     outputResult.outputFile.file.delete()
-                                    Triple(false, error.message ?: "Compression failed", null)
+
+                                    Triple(
+                                        false,
+                                        error.message ?: context.getString(R.string.compression_failed),
+                                        null
+                                    )
                                 }
                             }
                         )
                     } else {
-                        Triple(false, "Cannot create output file", null)
+                        Triple(
+                            false,
+                            context.getString(R.string.error_cannot_create_output),
+                            null
+                        )
                     }
                 } catch (e: Exception) {
-                    Triple(false, e.message ?: "Compression failed", null)
+                    Triple(
+                        false,
+                        e.message ?: context.getString(R.string.compression_failed),
+                        null
+                    )
                 }
             }
-            
+
             resultSuccess = result.first
             resultMessage = result.second
             resultUri = result.third
-            
+
             // Record in history
             if (resultSuccess && result.third != null) {
                 // Add to recent files
@@ -300,7 +336,10 @@ fun CompressScreen(
                     inputFileName = originalFile.name,
                     outputFileUri = result.third,
                     outputFileName = "compressed_${originalFile.name}",
-                    details = "Compressed from ${originalFile.formattedSize}"
+                    details = context.getString(
+                        R.string.compress_details_from_size,
+                        originalFile.formattedSize
+                    )
                 )
             } else if (!resultSuccess) {
                 HistoryManager.recordFailure(
@@ -322,7 +361,7 @@ fun CompressScreen(
     Scaffold(
         topBar = {
             ToolTopBar(
-                title = stringResource(R.string.tool_compress_pdf),
+                title = stringResource(R.string.compress_title),
                 onNavigateBack = onNavigateBack
             )
         }
@@ -341,7 +380,7 @@ fun CompressScreen(
                 if (selectedFile == null) {
                     EmptyState(
                         icon = Icons.Default.Compress,
-                        title = stringResource(R.string.metadata_no_pdf_selected),
+                        title = stringResource(R.string.no_pdf_selected),
                         subtitle = stringResource(R.string.compress_no_pdf_subtitle),
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -381,7 +420,10 @@ fun CompressScreen(
                                             color = MaterialTheme.colorScheme.onPrimaryContainer
                                         )
                                         Text(
-                                            text = "Original size: ${selectedFile!!.formattedSize}",
+                                            text = stringResource(
+                                                R.string.original_size,
+                                                selectedFile!!.formattedSize
+                                            ),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                                         )
@@ -418,12 +460,17 @@ fun CompressScreen(
                                         Tab(
                                             selected = compressionMode == CompressionMode.LEVEL,
                                             onClick = { compressionMode = CompressionMode.LEVEL },
-                                            text = { Text("Compression Level") }
+                                            text = {
+                                                Text(stringResource(R.string.compression_level))
+                                            }
                                         )
+
                                         Tab(
                                             selected = compressionMode == CompressionMode.TARGET_SIZE,
                                             onClick = { compressionMode = CompressionMode.TARGET_SIZE },
-                                            text = { Text("Target Size") }
+                                            text = {
+                                                Text(stringResource(R.string.target_size))
+                                            }
                                         )
                                     }
 
@@ -434,7 +481,7 @@ fun CompressScreen(
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                         Text(
-                                            text = "Compression Level",
+                                            text = stringResource(R.string.compression_level),
                                             style = MaterialTheme.typography.titleSmall,
                                             fontWeight = FontWeight.SemiBold
                                         )
@@ -444,10 +491,10 @@ fun CompressScreen(
                                         ) {
                                             Text(
                                                 text = when (compressionLevel) {
-                                                    CompressionLevel.LOW -> "Low"
-                                                    CompressionLevel.MEDIUM -> "Medium"
-                                                    CompressionLevel.HIGH -> "High"
-                                                    CompressionLevel.MAXIMUM -> "Maximum"
+                                                    CompressionLevel.LOW -> stringResource(R.string.compression_level_low)
+                                                    CompressionLevel.MEDIUM -> stringResource(R.string.compression_level_medium)
+                                                    CompressionLevel.HIGH -> stringResource(R.string.compression_level_high)
+                                                    CompressionLevel.MAXIMUM -> stringResource(R.string.compression_level_maximum)
                                                 },
                                                 style = MaterialTheme.typography.labelMedium,
                                                 fontWeight = FontWeight.Bold,
@@ -461,10 +508,17 @@ fun CompressScreen(
                                     
                                     Text(
                                         text = when (compressionLevel) {
-                                            CompressionLevel.LOW -> "Best quality, minor size reduction"
-                                            CompressionLevel.MEDIUM -> "Good balance of quality and size"
-                                            CompressionLevel.HIGH -> "Smaller file, reduced quality"
-                                            CompressionLevel.MAXIMUM -> "Smallest file, lowest quality"
+                                            CompressionLevel.LOW ->
+                                                stringResource(R.string.compression_level_low_description)
+
+                                            CompressionLevel.MEDIUM ->
+                                                stringResource(R.string.compression_level_medium_description)
+
+                                            CompressionLevel.HIGH ->
+                                                stringResource(R.string.compression_level_high_description)
+
+                                            CompressionLevel.MAXIMUM ->
+                                                stringResource(R.string.compression_level_maximum_description)
                                         },
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -484,12 +538,12 @@ fun CompressScreen(
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
                                         Text(
-                                            text = "Better quality",
+                                            text = stringResource(R.string.compress_better_quality),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                         Text(
-                                            text = "Smaller file",
+                                            text = stringResource(R.string.compress_smaller_file),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
@@ -502,7 +556,7 @@ fun CompressScreen(
                                                 targetSizeValue = newValue
                                             }
                                         },
-                                        label = { Text("Target Size") },
+                                        label = { Text(stringResource(R.string.target_size)) },
                                         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                                             keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
                                         ),
@@ -541,7 +595,7 @@ fun CompressScreen(
 
                                     if (fileExceedsError) {
                                         Text(
-                                            text = "Target size must be less than original file size.",
+                                            text = stringResource(R.string.compress_target_size_too_large),
                                             color = MaterialTheme.colorScheme.error,
                                             style = MaterialTheme.typography.bodySmall,
                                             modifier = Modifier.padding(start = 16.dp, top = 4.dp)
@@ -606,25 +660,32 @@ fun CompressScreen(
                                             } ?: 0L
 
                                             Text(
-                                                text = "Estimated Result",
+                                                text = stringResource(R.string.compress_estimated_result),
                                                 style = MaterialTheme.typography.labelLarge,
                                                 fontWeight = FontWeight.Medium,
                                                 color = MaterialTheme.colorScheme.onTertiaryContainer
                                             )
                                             Text(
-                                                text = "File size: ~${FileManager.formatFileSize(estimatedSize)}",
+                                                text = stringResource(
+                                                    R.string.file_size_estimated,
+                                                    FileManager.formatFileSize(estimatedSize)
+                                                ),
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
                                             )
                                         } else {
                                             Text(
-                                                text = "Target Size Optimization",
+                                                text = stringResource(R.string.compress_target_size_optimization),
                                                 style = MaterialTheme.typography.labelLarge,
                                                 fontWeight = FontWeight.Medium,
                                                 color = MaterialTheme.colorScheme.onTertiaryContainer
                                             )
                                             Text(
-                                                text = "Will compress to the smallest quality needed to fit under ${targetSizeValue.ifEmpty { "X" }} $targetSizeUnit",
+                                                text = stringResource(
+                                                    R.string.compress_target_size_description,
+                                                    targetSizeValue.ifEmpty { "X" },
+                                                    targetSizeUnit
+                                                ),
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
                                             )
@@ -657,7 +718,7 @@ fun CompressScreen(
                             ) {
                                 OperationProgress(
                                     progress = progress,
-                                    message = "Compressing PDF..."
+                                    message = stringResource(R.string.compress_progress)
                                 )
                             }
                         }
@@ -677,7 +738,7 @@ fun CompressScreen(
                 ) {
                     if (selectedFile == null) {
                         ActionButton(
-                            text = "Select PDF",
+                            text = stringResource(R.string.action_select_pdf),
                             onClick = {
                                 pickPdfLauncher.safeLaunch("application/pdf", context)
                             },
@@ -693,7 +754,7 @@ fun CompressScreen(
                         Spacer(modifier = Modifier.height(12.dp))
                         
                         ActionButton(
-                            text = "Compress PDF",
+                            text = stringResource(R.string.compress_title),
                             onClick = {
                                 if (compressionMode == CompressionMode.TARGET_SIZE && targetSizeValue.isEmpty()) {
                                     return@ActionButton
@@ -719,7 +780,11 @@ fun CompressScreen(
     if (showResult) {
         ResultDialog(
             isSuccess = resultSuccess,
-            title = if (resultSuccess) "Compression Complete" else "Compression Failed",
+            title = if (resultSuccess) {
+                stringResource(R.string.compress_complete)
+            } else {
+                stringResource(R.string.compression_failed)
+            },
             message = resultMessage,
             onDismiss = { 
                 showResult = false

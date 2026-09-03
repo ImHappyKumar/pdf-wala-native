@@ -194,7 +194,7 @@ fun RepairScreen(
     Scaffold(
         topBar = {
             ToolTopBar(
-                title = stringResource(R.string.tool_repair_pdf),
+                title = stringResource(R.string.repair_title),
                 onNavigateBack = onNavigateBack
             )
         }
@@ -213,7 +213,7 @@ fun RepairScreen(
                 if (selectedFile == null) {
                     EmptyState(
                         icon = Icons.Default.Build,
-                        title = stringResource(R.string.metadata_no_pdf_selected),
+                        title = stringResource(R.string.no_pdf_selected),
                         subtitle = stringResource(R.string.repair_no_pdf_subtitle),
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -357,7 +357,7 @@ fun RepairScreen(
                 ) {
                     if (selectedFile == null) {
                         ActionButton(
-                            text = "Select PDF",
+                            text = stringResource(R.string.action_select_pdf),
                             onClick = {
                                 pickPdfLauncher.safeLaunch(arrayOf("application/pdf"), context)
                             },

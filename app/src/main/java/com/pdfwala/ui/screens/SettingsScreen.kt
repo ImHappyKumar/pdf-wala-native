@@ -157,7 +157,7 @@ fun SettingsScreen(
         ) {
             // Quality Settings Section
             item {
-                SettingsSectionHeader(title = stringResource(R.string.settings_section_quality))
+                SettingsSectionHeader(title = stringResource(R.string.label_quality))
             }
             
             // Default Compression Quality
@@ -261,19 +261,19 @@ fun SettingsScreen(
             }
             
             // Language Section
-//            item {
-//                SettingsSectionHeader(title = stringResource(R.string.settings_section_language))
-//            }
+            item {
+                SettingsSectionHeader(title = stringResource(R.string.settings_section_language))
+            }
             
-            // Language Selector
-//            item {
-//                SettingsItem(
-//                    title = stringResource(R.string.settings_select_language),
-//                    subtitle = LanguageManager.getLanguageDisplayName(currentLanguage),
-//                    icon = Icons.Default.Language,
-//                    onClick = { showLanguageScreen = true }
-//                )
-//            }
+             // Language Selector
+            item {
+                SettingsItem(
+                    title = stringResource(R.string.settings_select_language),
+                    subtitle = LanguageManager.getLanguageDisplayName(currentLanguage),
+                    icon = Icons.Default.Language,
+                    onClick = { showLanguageScreen = true }
+                )
+            }
             
             // Storage Section
             item {
@@ -307,7 +307,7 @@ fun SettingsScreen(
             
             item {
                 SettingsItem(
-                    title = stringResource(R.string.settings_request_feature),
+                    title = stringResource(R.string.feature_request_title),
                     subtitle = stringResource(R.string.settings_request_feature_subtitle),
                     icon = Icons.Default.Lightbulb,
                     onClick = { showFeatureRequestDialog = true }
@@ -343,7 +343,7 @@ fun SettingsScreen(
             
             item {
                 SettingsItem(
-                    title = stringResource(R.string.settings_version),
+                    title = stringResource(R.string.label_version),
                     subtitle = "${BuildConfig.VERSION_NAME} (Build ${BuildConfig.VERSION_CODE})",
                     icon = Icons.Default.Info,
                     onClick = { showAboutDialog = true }
@@ -383,7 +383,7 @@ fun SettingsScreen(
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = stringResource(R.string.settings_app_name),
+                        text = stringResource(R.string.app_name),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -602,14 +602,14 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(stringResource(R.string.settings_about_version), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.label_version), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(BuildConfig.VERSION_NAME)
                     }
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(stringResource(R.string.settings_about_build), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.label_build), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(BuildConfig.VERSION_CODE.toString())
                     }
                     Row(
@@ -647,7 +647,7 @@ private fun getQualityDescription(quality: Int): String {
         quality >= 90 -> stringResource(R.string.compress_quality_maximum)
         quality >= 75 -> stringResource(R.string.compress_quality_high)
         quality >= 60 -> stringResource(R.string.compress_quality_balanced)
-        quality >= 45 -> stringResource(R.string.compress_quality_compressed)
+        quality >= 45 -> stringResource(R.string.compress_smaller_file)
         else -> stringResource(R.string.compress_quality_maximum_compression)
     }
 }

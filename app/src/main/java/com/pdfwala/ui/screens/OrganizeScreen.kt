@@ -201,7 +201,7 @@ fun OrganizeScreen(
     Scaffold(
         topBar = {
             ToolTopBar(
-                title = stringResource(R.string.tool_organize_pages),
+                title = stringResource(R.string.organize_title),
                 onNavigateBack = onNavigateBack
             )
         }
@@ -220,7 +220,7 @@ fun OrganizeScreen(
                 if (selectedFile == null) {
                     EmptyState(
                         icon = Icons.Default.SwapVert,
-                        title = stringResource(R.string.metadata_no_pdf_selected),
+                        title = stringResource(R.string.no_pdf_selected),
                         subtitle = stringResource(R.string.organize_no_pdf_subtitle),
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -299,12 +299,12 @@ fun OrganizeScreen(
                                 TextButton(onClick = { 
                                     selectedPages = (1..pageCount).toSet()
                                 }) {
-                                    Text(stringResource(R.string.action_select_all))
+                                    Text(stringResource(R.string.label_all))
                                 }
                                 TextButton(onClick = { 
                                     selectedPages = setOf()
                                 }) {
-                                    Text(stringResource(R.string.action_select_none))
+                                    Text(stringResource(R.string.label_none))
                                 }
                             }
                         }
@@ -371,7 +371,7 @@ fun OrganizeScreen(
                 ) {
                     if (selectedFile == null) {
                         ActionButton(
-                            text = "Select PDF",
+                            text = stringResource(R.string.action_select_pdf),
                             onClick = {
                                 pickPdfLauncher.safeLaunch(arrayOf("application/pdf"), context)
                             },

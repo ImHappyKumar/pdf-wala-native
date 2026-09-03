@@ -349,7 +349,7 @@ fun PdfViewerScreen(
                             // Navigate search results
                             if (searchState.matches.isNotEmpty()) {
                                 IconButton(onClick = { viewModel.prevMatch() }) {
-                                    Icon(Icons.Default.KeyboardArrowUp, contentDescription = stringResource(R.string.action_previous))
+                                    Icon(Icons.Default.KeyboardArrowUp, contentDescription = stringResource(R.string.cd_previous_result))
                                 }
                                 IconButton(onClick = { viewModel.nextMatch() }) {
                                     Icon(Icons.Default.KeyboardArrowDown, contentDescription = stringResource(R.string.action_next))
@@ -389,7 +389,7 @@ fun PdfViewerScreen(
                                 viewModel.setTool(PdfTool.Search)
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             }) {
-                                Icon(Icons.Default.Search, contentDescription = stringResource(R.string.pdf_search))
+                                Icon(Icons.Default.Search, contentDescription = stringResource(R.string.action_search))
                             }
                             
                             val isEditMode = toolState is PdfTool.Edit
@@ -1122,7 +1122,7 @@ private fun ErrorState(
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(onClick = onGoBack) {
-            Text(stringResource(R.string.action_go_back))
+            Text(stringResource(R.string.action_back))
         }
     }
 }

@@ -426,7 +426,7 @@ fun AppNavigation(
                             IconButton(onClick = { isHistorySidebarOpen = true }) {
                                 Icon(
                                     imageVector = Icons.Default.Menu,
-                                    contentDescription = stringResource(R.string.nav_open_history)
+                                    contentDescription = stringResource(R.string.history_title)
                                 )
                             }
                         },
@@ -437,7 +437,7 @@ fun AppNavigation(
                                 Text(
                                     text = when (currentRoute) {
                                         Screen.Tools.route -> stringResource(R.string.app_name)
-                                        Screen.Files.route -> stringResource(R.string.nav_tab_files)
+                                        Screen.Files.route -> stringResource(R.string.label_files)
                                         else -> stringResource(R.string.app_name)
                                     },
                                     style = MaterialTheme.typography.titleLarge,
@@ -973,7 +973,7 @@ private fun BottomNavigationBar(
 @Composable
 private fun getTabTitle(tab: BottomNavTab): String {
     return when (tab) {
-        BottomNavTab.TOOLS -> stringResource(R.string.nav_tab_tools)
-        BottomNavTab.FILES -> stringResource(R.string.nav_tab_files)
+        BottomNavTab.TOOLS -> stringResource(R.string.pdf_tools)
+        BottomNavTab.FILES -> stringResource(R.string.label_files)
     }
 }

@@ -151,22 +151,26 @@ fun ConvertScreen(
                         )
                         
                         outputStream.close()
-                        
+
                         result.fold(
                             onSuccess = { count ->
                                 resultSuccess = true
                                 resultUri = outputUri
-                                resultMessage = "Successfully converted $count images to PDF"
+                                resultMessage = context.getString(
+                                    R.string.convert_success_message,
+                                    count
+                                )
                                 selectedImages = emptyList()
                             },
                             onFailure = { error ->
                                 resultSuccess = false
-                                resultMessage = error.message ?: "Conversion failed"
+                                resultMessage = error.message
+                                    ?: context.getString(R.string.convert_failed)
                             }
                         )
                     } else {
                         resultSuccess = false
-                        resultMessage = "Cannot create output file"
+                        resultMessage = context.getString(R.string.error_cannot_create_output)
                     }
                     
                     isProcessing = false
@@ -199,21 +203,42 @@ fun ConvertScreen(
                         )
                         
                         outputResult.outputStream.close()
-                        
+
                         convertResult.fold(
                             onSuccess = { count ->
-                                Triple(true, "Successfully converted $count images to PDF\n\nSaved to: ${OutputFolderManager.getOutputFolderPath(context)}/${outputResult.outputFile.fileName}", outputResult.outputFile.contentUri)
+                                Triple(
+                                    true,
+                                    context.getString(
+                                        R.string.convert_success_saved_to,
+                                        count,
+                                        OutputFolderManager.getOutputFolderPath(context),
+                                        outputResult.outputFile.fileName
+                                    ),
+                                    outputResult.outputFile.contentUri
+                                )
                             },
                             onFailure = { error ->
                                 outputResult.outputFile.file.delete()
-                                Triple(false, error.message ?: "Conversion failed", null)
+                                Triple(
+                                    false,
+                                    error.message ?: context.getString(R.string.convert_failed),
+                                    null
+                                )
                             }
                         )
                     } else {
-                        Triple(false, "Cannot create output file", null)
+                        Triple(
+                            false,
+                            context.getString(R.string.error_cannot_create_output),
+                            null
+                        )
                     }
                 } catch (e: Exception) {
-                    Triple(false, e.message ?: "Conversion failed", null)
+                    Triple(
+                        false,
+                        e.message ?: context.getString(R.string.convert_failed),
+                        null
+                    )
                 }
             }
             
@@ -229,16 +254,27 @@ fun ConvertScreen(
                 HistoryManager.recordSuccess(
                     context = context,
                     operationType = OperationType.CONVERT,
-                    inputFileName = "$imageCount images",
+                    inputFileName = context.resources.getQuantityString(
+                        R.plurals.label_images_count,
+                        imageCount,
+                        imageCount
+                    ),
                     outputFileUri = result.third,
                     outputFileName = "images_to_pdf.pdf",
-                    details = "Converted $imageCount images to PDF"
+                    details = context.getString(
+                        R.string.convert_history_details,
+                        imageCount
+                    )
                 )
             } else if (!resultSuccess) {
                 HistoryManager.recordFailure(
                     context = context,
                     operationType = OperationType.CONVERT,
-                    inputFileName = "$imageCount images",
+                    inputFileName = context.resources.getQuantityString(
+                        R.plurals.label_images_count,
+                        imageCount,
+                        imageCount
+                    ),
                     errorMessage = result.second
                 )
             }
@@ -296,14 +332,17 @@ fun ConvertScreen(
                             ) {
                                 Column {
                                     Text(
-                                        text = "Selected Images (${selectedImages.size})",
+                                        text = stringResource(
+                                            R.string.convert_selected_images_count,
+                                            selectedImages.size
+                                        ),
                                         style = MaterialTheme.typography.titleSmall,
                                         fontWeight = FontWeight.SemiBold,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     if (hasOrderChanged) {
                                         Text(
-                                            text = "Order modified",
+                                            text = stringResource(R.string.convert_order_modified),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.primary
                                         )
@@ -425,7 +464,7 @@ fun ConvertScreen(
                         item(span = { GridItemSpan(3) }) {
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "Settings",
+                                text = stringResource(R.string.settings_title),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -446,7 +485,7 @@ fun ConvertScreen(
                                         .padding(16.dp)
                                 ) {
                                     Text(
-                                        text = "Page Size",
+                                        text = stringResource(R.string.scan_page_size),
                                         style = MaterialTheme.typography.labelLarge,
                                         fontWeight = FontWeight.Medium
                                     )
@@ -487,7 +526,7 @@ fun ConvertScreen(
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
                                         Text(
-                                            text = "Image Quality",
+                                            text = stringResource(R.string.convert_image_quality),
                                             style = MaterialTheme.typography.labelLarge,
                                             fontWeight = FontWeight.Medium
                                         )
@@ -513,12 +552,12 @@ fun ConvertScreen(
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
                                         Text(
-                                            text = "Smaller file",
+                                            text = stringResource(R.string.compress_smaller_file),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                         Text(
-                                            text = "Better quality",
+                                            text = stringResource(R.string.compress_better_quality),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
@@ -550,7 +589,7 @@ fun ConvertScreen(
                             ) {
                                 OperationProgress(
                                     progress = progress,
-                                    message = "Converting images..."
+                                    message = stringResource(R.string.convert_progress)
                                 )
                             }
                         }
@@ -570,7 +609,7 @@ fun ConvertScreen(
                 ) {
                     if (selectedImages.isEmpty()) {
                         ActionButton(
-                            text = "Select Images",
+                            text = stringResource(R.string.convert_select_images),
                             onClick = {
                                 pickImagesLauncher.safeLaunch(arrayOf("image/*"), context)
                             },
@@ -586,7 +625,7 @@ fun ConvertScreen(
                         Spacer(modifier = Modifier.height(12.dp))
                         
                         ActionButton(
-                            text = "Convert to PDF",
+                            text = stringResource(R.string.convert_to_pdf),
                             onClick = {
                                 if (useCustomLocation) {
                                     val fileName = FileManager.generateOutputFileName("images")
@@ -608,7 +647,11 @@ fun ConvertScreen(
     if (showResult) {
         ResultDialog(
             isSuccess = resultSuccess,
-            title = if (resultSuccess) "Conversion Complete" else "Conversion Failed",
+            title = if (resultSuccess) {
+                stringResource(R.string.convert_complete)
+            } else {
+                stringResource(R.string.convert_failed)
+            },
             message = resultMessage,
             onDismiss = { 
                 showResult = false
@@ -708,7 +751,10 @@ private fun ImagePreviewCard(
                     color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.9f)
                 ) {
                     Text(
-                        text = "was ${image.originalIndex + 1}",
+                        text = stringResource(
+                            R.string.convert_original_position,
+                            image.originalIndex + 1
+                        ),
                         modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onTertiaryContainer

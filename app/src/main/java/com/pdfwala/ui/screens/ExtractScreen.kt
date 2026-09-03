@@ -1,19 +1,14 @@
 package com.pdfwala.ui.screens
 import com.pdfwala.util.safeLaunch
+import com.pdfwala.R
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import com.pdfwala.ui.components.PdfThumbnailGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -21,8 +16,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.pdfwala.data.FileManager
 import com.pdfwala.data.HistoryManager
@@ -104,21 +100,25 @@ fun ExtractScreen(
                     )
                     
                     outputStream.close()
-                    
+
                     result.fold(
                         onSuccess = { count ->
                             resultSuccess = true
-                            resultMessage = "Successfully extracted $count pages"
+                            resultMessage = context.getString(
+                                R.string.extract_success_count,
+                                count
+                            )
                             resultUri = outputUri
                         },
                         onFailure = { error ->
                             resultSuccess = false
-                            resultMessage = error.message ?: "Extraction failed"
+                            resultMessage = error.message
+                                ?: context.getString(R.string.extract_failed)
                         }
                     )
                 } else {
                     resultSuccess = false
-                    resultMessage = "Cannot create output file"
+                    resultMessage = context.getString(R.string.error_cannot_create_output)
                 }
                 
                 isProcessing = false
@@ -154,18 +154,48 @@ fun ExtractScreen(
                         
                         extractResult.fold(
                             onSuccess = { count ->
-                                Triple(true, "Successfully extracted $count pages\n\nSaved to: ${OutputFolderManager.getOutputFolderPath(context)}/${outputResult.outputFile.fileName}", outputResult.outputFile.contentUri)
+                                val outputPath =
+                                    "${OutputFolderManager.getOutputFolderPath(context)}/${outputResult.outputFile.fileName}"
+
+                                val successMessage = context.getString(
+                                    R.string.extract_success_count,
+                                    count
+                                )
+
+                                val savedToMessage = context.getString(
+                                    R.string.saved_to,
+                                    outputPath
+                                )
+
+                                Triple(
+                                    true,
+                                    "$successMessage\n\n$savedToMessage",
+                                    outputResult.outputFile.contentUri
+                                )
                             },
                             onFailure = { error ->
                                 outputResult.outputFile.file.delete()
-                                Triple(false, error.message ?: "Extraction failed", null)
+
+                                Triple(
+                                    false,
+                                    error.message ?: context.getString(R.string.extract_failed),
+                                    null
+                                )
                             }
                         )
                     } else {
-                        Triple(false, "Cannot create output file", null)
+                        Triple(
+                            false,
+                            context.getString(R.string.error_cannot_create_output),
+                            null
+                        )
                     }
                 } catch (e: Exception) {
-                    Triple(false, e.message ?: "Extraction failed", null)
+                    Triple(
+                        false,
+                        e.message ?: context.getString(R.string.extract_failed),
+                        null
+                    )
                 }
             }
             
@@ -181,7 +211,10 @@ fun ExtractScreen(
                     inputFileName = originalFile.name,
                     outputFileUri = result.third,
                     outputFileName = "extracted_${originalFile.name}",
-                    details = "Extracted ${pagesList.size} pages"
+                    details = context.getString(
+                        R.string.extract_details_count,
+                        pagesList.size
+                    )
                 )
             } else if (!resultSuccess) {
                 HistoryManager.recordFailure(
@@ -200,7 +233,7 @@ fun ExtractScreen(
     Scaffold(
         topBar = {
             ToolTopBar(
-                title = "Extract Pages",
+                title = context.getString(R.string.tool_extract_pages),
                 onNavigateBack = onNavigateBack
             )
         }
@@ -219,8 +252,8 @@ fun ExtractScreen(
                 if (selectedFile == null) {
                     EmptyState(
                         icon = Icons.Default.ContentCopy,
-                        title = "No PDF Selected",
-                        subtitle = "Select a PDF file to extract specific pages",
+                        title = context.getString(R.string.no_pdf_selected),
+                        subtitle = context.getString(R.string.extract_pages_select_subtitle),
                         modifier = Modifier.align(Alignment.Center)
                     )
                 } else {
@@ -258,7 +291,11 @@ fun ExtractScreen(
                                         color = MaterialTheme.colorScheme.onPrimaryContainer
                                     )
                                     Text(
-                                        text = "$pageCount pages • ${selectedFile!!.formattedSize}",
+                                        text = "${pluralStringResource(
+                                            R.plurals.label_pages_count,
+                                            pageCount,
+                                            pageCount
+                                        )} • ${selectedFile!!.formattedSize}",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                                     )
@@ -269,7 +306,7 @@ fun ExtractScreen(
                                 }) {
                                     Icon(
                                         imageVector = Icons.Default.Close,
-                                        contentDescription = "Remove",
+                                        contentDescription = stringResource(R.string.action_remove),
                                         tint = MaterialTheme.colorScheme.onPrimaryContainer
                                     )
                                 }
@@ -285,7 +322,11 @@ fun ExtractScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Select Pages (${selectedPages.size} of $pageCount)",
+                                text = stringResource(
+                                    R.string.select_pages_count,
+                                    selectedPages.size,
+                                    pageCount
+                                ),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -295,12 +336,12 @@ fun ExtractScreen(
                                 TextButton(
                                     onClick = { selectedPages = (1..pageCount).toSet() }
                                 ) {
-                                    Text("Select All")
+                                    Text(stringResource(R.string.action_select_all))
                                 }
                                 TextButton(
                                     onClick = { selectedPages = emptySet() }
                                 ) {
-                                    Text("Clear")
+                                    Text(stringResource(R.string.action_clear))
                                 }
                             }
                         }
@@ -351,7 +392,7 @@ fun ExtractScreen(
                             ) {
                                 OperationProgress(
                                     progress = progress,
-                                    message = "Extracting pages..."
+                                    message = context.getString(R.string.extracting_pages)
                                 )
                             }
                         }
@@ -371,7 +412,7 @@ fun ExtractScreen(
                 ) {
                     if (selectedFile == null) {
                         ActionButton(
-                            text = "Select PDF",
+                            text = stringResource(R.string.action_select_pdf),
                             onClick = {
                                 pickPdfLauncher.safeLaunch(arrayOf("application/pdf"), context)
                             },
@@ -379,7 +420,10 @@ fun ExtractScreen(
                         )
                     } else {
                         ActionButton(
-                            text = "Extract ${selectedPages.size} Pages",
+                            text = stringResource(
+                                R.string.extract_pages_count,
+                                selectedPages.size
+                            ),
                             onClick = {
                                 if (useCustomLocation) {
                                     val fileName = FileManager.generateOutputFileName("extracted")
@@ -402,7 +446,11 @@ fun ExtractScreen(
     if (showResult) {
         ResultDialog(
             isSuccess = resultSuccess,
-            title = if (resultSuccess) "Extraction Complete" else "Extraction Failed",
+            title = if (resultSuccess) {
+                context.getString(R.string.extraction_complete)
+            } else {
+                context.getString(R.string.extract_failed)
+            },
             message = resultMessage,
             onDismiss = { 
                 showResult = false
@@ -411,7 +459,7 @@ fun ExtractScreen(
             onAction = resultUri?.let { uri ->
                 { scope.launch(Dispatchers.IO) { FileOpener.openPdf(context, uri) } }
             },
-            actionText = "Open PDF"
+            actionText = stringResource(R.string.action_open_pdf)
         )
     }
 }

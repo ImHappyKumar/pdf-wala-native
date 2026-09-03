@@ -778,7 +778,7 @@ fun OcrScreen(
                                         saveTextLauncher.safeLaunch("extracted_text_${System.currentTimeMillis()}.txt", context)
                                     }
                                 }) {
-                                    Icon(Icons.Default.Save, contentDescription = stringResource(R.string.pdf_save))
+                                    Icon(Icons.Default.Save, contentDescription = stringResource(R.string.action_save))
                                 }
                             }
                         )

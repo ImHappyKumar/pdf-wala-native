@@ -374,7 +374,7 @@ fun SignPdfScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.tool_sign_pdf)) },
+                title = { Text(stringResource(R.string.sign_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.action_back))
@@ -898,7 +898,7 @@ fun SignPdfScreen(
             ) {
                 Icon(Icons.Default.Draw, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(stringResource(R.string.tool_sign_pdf))
+                Text(stringResource(R.string.sign_title))
             }
             
             // Reset Button

@@ -121,18 +121,40 @@ fun MergeScreen(
                         
                         mergeResult.fold(
                             onSuccess = {
-                                Triple(true, "Successfully merged $fileCount PDFs\n\nSaved to: ${OutputFolderManager.getOutputFolderPath(context)}/${outputResult.outputFile.fileName}", outputResult.outputFile.contentUri)
+                                Triple(
+                                    true,
+                                    context.getString(
+                                        R.string.merge_success_message,
+                                        fileCount,
+                                        OutputFolderManager.getOutputFolderPath(context),
+                                        outputResult.outputFile.fileName
+                                    ),
+                                    outputResult.outputFile.contentUri
+                                )
                             },
                             onFailure = { error ->
                                 outputResult.outputFile.file.delete()
-                                Triple(false, error.message ?: "Merge failed", null)
+
+                                Triple(
+                                    false,
+                                    error.message ?: context.getString(R.string.merge_failed),
+                                    null
+                                )
                             }
                         )
                     } else {
-                        Triple(false, "Cannot create output file", null)
+                        Triple(
+                            false,
+                            context.getString(R.string.error_cannot_create_output),
+                            null
+                        )
                     }
                 } catch (e: Exception) {
-                    Triple(false, e.message ?: "Merge failed", null)
+                    Triple(
+                        false,
+                        e.message ?: context.getString(R.string.merge_failed),
+                        null
+                    )
                 }
             }
             
@@ -148,7 +170,10 @@ fun MergeScreen(
                     inputFileName = firstFileName,
                     outputFileUri = result.third,
                     outputFileName = "merged_${fileCount}_files.pdf",
-                    details = "Merged $fileCount PDF files"
+                    details = context.getString(
+                        R.string.merge_details_count,
+                        fileCount
+                    )
                 )
             } else if (!resultSuccess) {
                 HistoryManager.recordFailure(
@@ -188,7 +213,7 @@ fun MergeScreen(
                     // Empty state
                     EmptyState(
                         icon = Icons.Default.MergeType,
-                        title = stringResource(R.string.merge_empty_title),
+                        title = stringResource(R.string.empty_no_pdfs),
                         subtitle = stringResource(R.string.merge_empty_subtitle),
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -400,14 +425,29 @@ private fun performMerge(
             
             result.fold(
                 onSuccess = {
-                    onResult(true, "Successfully merged ${selectedFiles.size} PDFs", outputUri)
+                    onResult(
+                        true,
+                        context.getString(
+                            R.string.merge_success_count,
+                            selectedFiles.size
+                        ),
+                        outputUri
+                    )
                 },
                 onFailure = { error ->
-                    onResult(false, error.message ?: "Merge failed", null)
+                    onResult(
+                        false,
+                        error.message ?: context.getString(R.string.merge_failed),
+                        null
+                    )
                 }
             )
         } else {
-            onResult(false, "Cannot create output file", null)
+            onResult(
+                false,
+                context.getString(R.string.error_cannot_create_output),
+                null
+            )
         }
         
         onProcessing(false)

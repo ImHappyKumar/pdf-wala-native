@@ -43,7 +43,7 @@ fun getToolSections(): List<ToolSectionData> {
         ToolSectionData(stringResource(R.string.category_organize)),
         ToolSectionData(stringResource(R.string.category_convert)),
         ToolSectionData(stringResource(R.string.category_security)),
-        ToolSectionData(stringResource(R.string.category_image_tools)),
+        ToolSectionData(stringResource(R.string.imgtools_title)),
         ToolSectionData(stringResource(R.string.category_view_export))
     )
 }
@@ -224,7 +224,7 @@ private fun getSectionTitle(section: ToolSection): String {
         ToolSection.ORGANIZE -> stringResource(R.string.category_organize)
         ToolSection.CONVERT -> stringResource(R.string.category_convert)
         ToolSection.SECURITY -> stringResource(R.string.category_security)
-        ToolSection.IMAGE_TOOLS -> stringResource(R.string.category_image_tools)
+        ToolSection.IMAGE_TOOLS -> stringResource(R.string.imgtools_title)
         ToolSection.VIEW_EXPORT -> stringResource(R.string.category_view_export)
     }
 }
@@ -364,7 +364,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "split",
-        titleResId = R.string.tool_split_pdf,
+        titleResId = R.string.split_title,
         descResId = R.string.desc_split_pdf,
         icon = Icons.Default.CallSplit,
         section = ToolSection.QUICK_ACTIONS,
@@ -372,7 +372,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "compress",
-        titleResId = R.string.tool_compress_pdf,
+        titleResId = R.string.compress_title,
         descResId = R.string.desc_compress_pdf,
         icon = Icons.Default.Compress,
         section = ToolSection.QUICK_ACTIONS,
@@ -380,7 +380,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "pdf_to_image",
-        titleResId = R.string.tool_pdf_to_images,
+        titleResId = R.string.pdf2img_title,
         descResId = R.string.desc_pdf_to_images,
         icon = Icons.Default.PhotoLibrary,
         section = ToolSection.QUICK_ACTIONS,
@@ -388,7 +388,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "image_to_pdf",
-        titleResId = R.string.tool_images_to_pdf,
+        titleResId = R.string.convert_title,
         descResId = R.string.desc_images_to_pdf,
         icon = Icons.Default.Image,
         section = ToolSection.QUICK_ACTIONS,
@@ -398,7 +398,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     // SECTION 2: ORGANIZE
     ToolItem(
         id = "reorder",
-        titleResId = R.string.tool_reorder_pages,
+        titleResId = R.string.organize_reorder_pages,
         descResId = R.string.desc_reorder_pages,
         icon = Icons.Default.SwapVert,
         section = ToolSection.ORGANIZE,
@@ -406,7 +406,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "rotate",
-        titleResId = R.string.tool_rotate_pages,
+        titleResId = R.string.rotate_title,
         descResId = R.string.desc_rotate_pages,
         icon = Icons.Default.RotateRight,
         section = ToolSection.ORGANIZE,
@@ -414,7 +414,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "delete_pages",
-        titleResId = R.string.tool_delete_pages,
+        titleResId = R.string.organize_remove_pages,
         descResId = R.string.desc_delete_pages,
         icon = Icons.Default.Delete,
         section = ToolSection.ORGANIZE,
@@ -432,7 +432,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     // SECTION 3: CONVERT (PDF-CENTRIC)
     ToolItem(
         id = "html_to_pdf",
-        titleResId = R.string.tool_html_to_pdf,
+        titleResId = R.string.html_title,
         descResId = R.string.desc_html_to_pdf,
         icon = Icons.Default.Language,
         section = ToolSection.CONVERT,
@@ -448,7 +448,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "ocr",
-        titleResId = R.string.tool_ocr,
+        titleResId = R.string.ocr_title,
         descResId = R.string.desc_ocr,
         icon = Icons.Default.DocumentScanner,
         section = ToolSection.CONVERT,
@@ -456,7 +456,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "extract_text",
-        titleResId = R.string.tool_extract_text,
+        titleResId = R.string.extract_title,
         descResId = R.string.desc_extract_text,
         icon = Icons.Default.TextFields,
         section = ToolSection.CONVERT,
@@ -482,7 +482,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "watermark",
-        titleResId = R.string.tool_add_watermark,
+        titleResId = R.string.watermark_title,
         descResId = R.string.desc_add_watermark,
         icon = Icons.Default.WaterDrop,
         section = ToolSection.SECURITY,
@@ -490,7 +490,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "sign",
-        titleResId = R.string.tool_sign_pdf,
+        titleResId = R.string.sign_title,
         descResId = R.string.desc_sign,
         icon = Icons.Default.Draw,
         section = ToolSection.SECURITY,
@@ -498,7 +498,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "fill_forms",
-        titleResId = R.string.tool_fill_forms,
+        titleResId = R.string.fill_title,
         descResId = R.string.desc_fill_forms,
         icon = Icons.Default.EditNote,
         section = ToolSection.SECURITY,
@@ -506,7 +506,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "flatten",
-        titleResId = R.string.tool_flatten_pdf,
+        titleResId = R.string.flatten_title,
         descResId = R.string.desc_flatten_pdf,
         icon = Icons.Default.Layers,
         section = ToolSection.SECURITY,
@@ -558,7 +558,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "page_numbers",
-        titleResId = R.string.tool_page_numbers,
+        titleResId = R.string.pagenum_title,
         descResId = R.string.desc_page_numbers,
         icon = Icons.Default.FormatListNumbered,
         section = ToolSection.VIEW_EXPORT,

@@ -231,7 +231,7 @@ fun HtmlToPdfScreen(
     Scaffold(
         topBar = {
             ToolTopBar(
-                title = stringResource(R.string.tool_html_to_pdf),
+                title = stringResource(R.string.html_title),
                 onNavigateBack = onNavigateBack
             )
         }
@@ -273,7 +273,7 @@ fun HtmlToPdfScreen(
                                 FilterChip(
                                     selected = inputMode == InputMode.HTML,
                                     onClick = { inputMode = InputMode.HTML },
-                                    label = { Text(stringResource(R.string.html_from_html)) },
+                                    label = { Text(stringResource(R.string.html_content_label)) },
                                     leadingIcon = if (inputMode == InputMode.HTML) {
                                         { Icon(Icons.Default.Code, null, Modifier.size(18.dp)) }
                                     } else null,

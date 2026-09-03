@@ -13,7 +13,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 
-/**
+/*
  * Represents a single history entry for an operation.
  */
 data class HistoryEntry(

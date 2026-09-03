@@ -245,7 +245,7 @@ fun WatermarkScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.tool_add_watermark)) },
+                title = { Text(stringResource(R.string.watermark_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.action_back))
@@ -579,7 +579,7 @@ fun WatermarkScreen(
             ) {
                 Icon(Icons.Default.WaterDrop, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(stringResource(R.string.tool_add_watermark))
+                Text(stringResource(R.string.watermark_title))
             }
             
             // Reset Button

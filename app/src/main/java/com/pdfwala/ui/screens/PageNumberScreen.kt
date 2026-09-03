@@ -197,7 +197,7 @@ fun PageNumberScreen(
                 if (selectedFile == null) {
                     EmptyState(
                         icon = Icons.Default.FormatListNumbered,
-                        title = stringResource(R.string.metadata_no_pdf_selected),
+                        title = stringResource(R.string.no_pdf_selected),
                         subtitle = stringResource(R.string.pagenum_no_pdf_subtitle),
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -428,7 +428,7 @@ fun PageNumberScreen(
                 ) {
                     if (selectedFile == null) {
                         ActionButton(
-                            text = "Select PDF",
+                            text = stringResource(R.string.action_select_pdf),
                             onClick = {
                                 pickPdfLauncher.safeLaunch(arrayOf("application/pdf"), context)
                             },

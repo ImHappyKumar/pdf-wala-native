@@ -4,7 +4,6 @@ import com.pdfwala.util.safeLaunch
 import androidx.compose.ui.res.stringResource
 import com.pdfwala.R
 
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -102,22 +101,23 @@ fun ExtractTextScreen(
                     result.fold(
                         onSuccess = { extractResult ->
                             resultSuccess = true
-                            resultMessage = buildString {
-                                append("Text extracted successfully!\n\n")
-                                append("Characters: ${extractResult.characterCount}\n")
-                                append("Words: ${extractResult.wordCount}\n")
-                                append("Pages: ${extractResult.pageCount}")
-                            }
+                            resultMessage = context.getString(
+                                R.string.extract_success_message,
+                                extractResult.characterCount,
+                                extractResult.wordCount,
+                                extractResult.pageCount
+                            )
                             selectedFile = null
                         },
                         onFailure = { error ->
                             resultSuccess = false
-                            resultMessage = error.message ?: "Extraction failed"
+                            resultMessage = error.message
+                                ?: context.getString(R.string.extract_failed)
                         }
                     )
                 } ?: run {
                     resultSuccess = false
-                    resultMessage = "Cannot create output file"
+                    resultMessage = context.getString(R.string.error_cannot_create_output)
                 }
                 
                 isProcessing = false
@@ -129,7 +129,7 @@ fun ExtractTextScreen(
     Scaffold(
         topBar = {
             ToolTopBar(
-                title = stringResource(R.string.tool_extract_text),
+                title = stringResource(R.string.extract_title),
                 onNavigateBack = onNavigateBack
             )
         }
@@ -148,7 +148,7 @@ fun ExtractTextScreen(
                 if (selectedFile == null) {
                     EmptyState(
                         icon = Icons.Default.TextFields,
-                        title = stringResource(R.string.metadata_no_pdf_selected),
+                        title = stringResource(R.string.no_pdf_selected),
                         subtitle = stringResource(R.string.extract_no_pdf_subtitle),
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -210,17 +210,17 @@ fun ExtractTextScreen(
                                     Column {
                                         Text(
                                             text = when {
-                                                isChecking -> "Analyzing PDF..."
-                                                hasExtractableText == true -> "Text Found"
-                                                hasExtractableText == false -> "No Text Detected"
-                                                else -> "Checking..."
+                                                isChecking -> stringResource(R.string.extract_analyzing)
+                                                hasExtractableText == true -> stringResource(R.string.extract_text_found)
+                                                hasExtractableText == false -> stringResource(R.string.extract_no_text_detected)
+                                                else -> stringResource(R.string.extract_checking)
                                             },
                                             style = MaterialTheme.typography.bodyMedium,
                                             fontWeight = FontWeight.Medium
                                         )
                                         if (hasExtractableText == false) {
                                             Text(
-                                                text = "This appears to be a scanned PDF. OCR would be needed.",
+                                                text = stringResource(R.string.extract_scanned_pdf),
                                                 style = MaterialTheme.typography.bodySmall
                                             )
                                         }
@@ -233,7 +233,7 @@ fun ExtractTextScreen(
                         if (previewText.isNotEmpty()) {
                             item {
                                 Text(
-                                    text = "Preview",
+                                    text = stringResource(R.string.extract_preview),
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.SemiBold,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -259,7 +259,7 @@ fun ExtractTextScreen(
                         // Options
                         item {
                             Text(
-                                text = "Options",
+                                text = stringResource(R.string.extract_options),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -281,12 +281,12 @@ fun ExtractTextScreen(
                                 ) {
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(
-                                            text = "Add Page Breaks",
+                                            text = stringResource(R.string.extract_add_page_breaks),
                                             style = MaterialTheme.typography.bodyMedium,
                                             fontWeight = FontWeight.Medium
                                         )
                                         Text(
-                                            text = "Insert markers between pages",
+                                            text = stringResource(R.string.extract_page_breaks_description),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
@@ -317,7 +317,7 @@ fun ExtractTextScreen(
                         ) {
                             OperationProgress(
                                 progress = progress,
-                                message = "Extracting text..."
+                                message = stringResource(R.string.extract_progress)
                             )
                         }
                     }
@@ -336,7 +336,7 @@ fun ExtractTextScreen(
                 ) {
                     if (selectedFile == null) {
                         ActionButton(
-                            text = "Select PDF",
+                            text = stringResource(R.string.action_select_pdf),
                             onClick = {
                                 pickPdfLauncher.safeLaunch(arrayOf("application/pdf"), context)
                             },
@@ -344,7 +344,7 @@ fun ExtractTextScreen(
                         )
                     } else {
                         ActionButton(
-                            text = "Extract to Text File",
+                            text = stringResource(R.string.extract_to_text_file),
                             onClick = {
                                 val baseName = selectedFile!!.name.removeSuffix(".pdf")
                                 saveFileLauncher.safeLaunch("${baseName}.txt", context)
@@ -363,7 +363,11 @@ fun ExtractTextScreen(
     if (showResult) {
         ResultDialog(
             isSuccess = resultSuccess,
-            title = if (resultSuccess) "Extraction Complete" else "Extraction Failed",
+            title = if (resultSuccess) {
+                stringResource(R.string.extract_complete)
+            } else {
+                stringResource(R.string.extract_failed)
+            },
             message = resultMessage,
             onDismiss = { showResult = false }
         )
