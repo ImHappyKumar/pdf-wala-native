@@ -185,7 +185,7 @@ fun FillFormsScreen(
                 val nameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
                 cursor.moveToFirst()
                 cursor.getString(nameIndex)
-            } ?: context.getString(R.string.annotate_selected_pdf)
+            } ?: context.getString(R.string.selected_pdf)
             viewModel.setSourcePdf(it, name, context)
         }
     }

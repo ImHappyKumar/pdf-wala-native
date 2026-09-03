@@ -261,19 +261,19 @@ fun SettingsScreen(
             }
             
             // Language Section
-            item {
-                SettingsSectionHeader(title = stringResource(R.string.settings_section_language))
-            }
+//            item {
+//                SettingsSectionHeader(title = stringResource(R.string.settings_section_language))
+//            }
             
              // Language Selector
-            item {
-                SettingsItem(
-                    title = stringResource(R.string.settings_select_language),
-                    subtitle = LanguageManager.getLanguageDisplayName(currentLanguage),
-                    icon = Icons.Default.Language,
-                    onClick = { showLanguageScreen = true }
-                )
-            }
+//            item {
+//                SettingsItem(
+//                    title = stringResource(R.string.settings_select_language),
+//                    subtitle = LanguageManager.getLanguageDisplayName(currentLanguage),
+//                    icon = Icons.Default.Language,
+//                    onClick = { showLanguageScreen = true }
+//                )
+//            }
             
             // Storage Section
             item {

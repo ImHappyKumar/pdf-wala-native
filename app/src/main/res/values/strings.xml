@@ -580,7 +580,7 @@
     <string name="pdf2img_resolution">Resolution (DPI)</string>
     <string name="pdf2img_resolution_fast">72 (Fast)</string>
     <string name="pdf2img_resolution_hd">300 (HD)</string>
-    <string name="pdf2img_gallery_info">Images will be saved to your device's gallery (Pictures/PDF Wala folder).</string>
+    <string name="pdf2img_gallery_info">Images will be saved to your device\'s gallery (Pictures/PDF Wala folder).</string>
     <string name="pdf2img_progress">Converting pages to images…</string>
     <string name="pdf2img_convert_action">Convert to Images</string>
     <string name="convert_complete">Conversion Complete</string>

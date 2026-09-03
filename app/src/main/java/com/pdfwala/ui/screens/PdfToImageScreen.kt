@@ -172,7 +172,7 @@ fun PdfToImageScreen(
                 onFailure = { error ->
                     resultSuccess = false
                     resultMessage = error.message
-                        ?: context.getString(R.string.pdf2img_conversion_failed)
+                        ?: context.getString(R.string.convert_failed)
                     
                     // Record failure
                     HistoryManager.recordFailure(
@@ -463,9 +463,9 @@ fun PdfToImageScreen(
                 Text(
                     stringResource(
                         if (resultSuccess) {
-                            R.string.pdf2img_conversion_complete
+                            R.string.convert_complete
                         } else {
-                            R.string.pdf2img_conversion_failed
+                            R.string.convert_failed
                         }
                     )
                 )
