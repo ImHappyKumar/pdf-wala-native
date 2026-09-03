@@ -5,6 +5,8 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -205,6 +207,11 @@ dependencies {
 
     // Fragment KTX (used by legacy viewer and other components)
     implementation("androidx.fragment:fragment-ktx:1.8.5")
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-crashlytics")
 }
 dependencies {
     testImplementation("androidx.test:core-ktx:1.5.0")
