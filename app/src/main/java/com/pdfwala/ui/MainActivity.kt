@@ -11,9 +11,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +26,8 @@ import androidx.navigation.compose.rememberNavController
 import com.pdfwala.data.SafUriManager
 import com.pdfwala.ui.navigation.AppNavigation
 import com.pdfwala.ui.theme.PDFWalaTheme
+import com.pdfwala.update.AppUpdateManager
+import com.pdfwala.update.UpdateInfo
 import com.pdfwala.util.CacheManager
 import com.pdfwala.util.RatingManager
 import com.pdfwala.util.ReviewHelper
@@ -62,6 +67,7 @@ class MainActivity : AppCompatActivity() {
     private var pdfUriState: androidx.compose.runtime.MutableState<Uri?>? = null
     private var pdfNameState: androidx.compose.runtime.MutableState<String?>? = null
     private var isLoadingState: androidx.compose.runtime.MutableState<Boolean>? = null
+    private lateinit var appUpdateManager: AppUpdateManager
     
     override fun onCreate(savedInstanceState: Bundle?) {
         // Language is already applied by PdfToolkitApplication.onCreate() before any
@@ -70,6 +76,8 @@ class MainActivity : AppCompatActivity() {
         // the perceived language-switch delay. Do not re-initialize here.
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
+        appUpdateManager = AppUpdateManager(this)
         
         // Handle intent if app is opened with a PDF
         // This MUST happen before setContent so pendingPdfUri is set
@@ -83,6 +91,8 @@ class MainActivity : AppCompatActivity() {
         
         setContent {
             PDFWalaTheme {
+                var updateInfo by remember { mutableStateOf<UpdateInfo?>(null) }
+
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -98,6 +108,12 @@ class MainActivity : AppCompatActivity() {
                     pdfUriState = pdfUri
                     pdfNameState = pdfName
                     isLoadingState = isLoading
+
+                    LaunchedEffect(Unit) {
+                        appUpdateManager.checkForUpdate { info ->
+                            updateInfo = info
+                        }
+                    }
                     
                     // Observe rating request
                     LaunchedEffect(Unit) {
@@ -125,6 +141,50 @@ class MainActivity : AppCompatActivity() {
                             initialPdfName = pdfName.value
                         )
                     }
+                }
+
+                updateInfo?.let { info ->
+
+                    val isImmediate = info.updateType.equals(
+                        "immediate",
+                        ignoreCase = true
+                    )
+
+                    AlertDialog(
+                        onDismissRequest = {
+                            if (!isImmediate) {
+                                updateInfo = null
+                            }
+                        },
+                        title = {
+                            Text("Update Available")
+                        },
+                        text = {
+                            Text(info.message)
+                        },
+                        confirmButton = {
+                            TextButton(
+                                onClick = {
+                                    appUpdateManager.openPlayStore()
+                                }
+                            ) {
+                                Text("Update")
+                            }
+                        },
+                        dismissButton = if (!isImmediate) {
+                            {
+                                TextButton(
+                                    onClick = {
+                                        updateInfo = null
+                                    }
+                                ) {
+                                    Text("Later")
+                                }
+                            }
+                        } else {
+                            null
+                        }
+                    )
                 }
             }
         }
