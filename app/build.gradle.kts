@@ -125,6 +125,10 @@ android {
             enableSplit = true
         }
     }
+
+    lint {
+        disable += "ExtraTranslation"
+    }
 }
 
 dependencies {
@@ -213,8 +217,11 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-config")
-}
-dependencies {
+
+    // In-App Update
+    implementation("com.google.android.play:app-update:2.1.0")
+    implementation("com.google.android.play:app-update-ktx:2.1.0")
+
     testImplementation("androidx.test:core-ktx:1.5.0")
     testImplementation("androidx.test.ext:junit-ktx:1.1.5")
 }

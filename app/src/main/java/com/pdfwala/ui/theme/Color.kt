@@ -3,7 +3,7 @@ package com.pdfwala.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // Primary brand
-val Primary = Color(0xFFE53935)
+val Primary = Color(0xFFEB2F2B)
 val PrimaryDark = Color(0xFFC62828)
 val PrimaryLight = Color(0xFFFFEBEE)
 
