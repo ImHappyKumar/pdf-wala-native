@@ -25,7 +25,7 @@ sealed class Screen(val route: String) {
     object Tools : Screen("tools")
     object Files : Screen("files")
     object Settings : Screen("settings")
-    
+
     // PDF Viewer (native/AndroidX viewer - primary route)
     object PdfViewer : Screen("pdf_viewer?uri={uri}&name={name}") {
         fun createRoute(uri: String, name: String): String {
@@ -40,7 +40,7 @@ sealed class Screen(val route: String) {
             return "pdf_viewer_legacy?uri=$uri&name=$name"
         }
     }
-    
+
     // PDF Tools
     object Merge : Screen("merge")
     object Split : Screen("split")
@@ -64,16 +64,23 @@ sealed class Screen(val route: String) {
     object FillForms : Screen("fill_forms")
     object Annotate : Screen("annotate")
     object ScanToPdf : Screen("scan_to_pdf")
+    object DocToPdf : Screen("doc_to_pdf")
+    object DocViewer : Screen("doc_viewer?uri={uri}&name={name}") {
+        fun createRoute(uri: String, name: String): String {
+            return "doc_viewer?uri=$uri&name=$name"
+        }
+    }
     object Ocr : Screen("ocr")
+    object PrintStudio : Screen("print_studio")
     object ImageTools : Screen("image_tools?operation={operation}") {
         fun createRoute(operation: String = "resize"): String {
             return "image_tools?operation=$operation"
         }
     }
-    
+
     // Legacy compatibility
     object Home : Screen("tools")
-    
+
     companion object {
         /**
          * Returns the Screen object for a given tool ID.
@@ -92,6 +99,7 @@ sealed class Screen(val route: String) {
                 "extract" -> Extract
                 "html_to_pdf" -> HtmlToPdf
                 "scan_to_pdf" -> ScanToPdf
+                "doc_to_pdf" -> DocToPdf
                 "ocr" -> Ocr
                 "extract_text" -> ExtractText
                 "lock" -> Security
@@ -108,10 +116,12 @@ sealed class Screen(val route: String) {
                 "annotate" -> Annotate
                 "fill_forms" -> FillForms
                 "repair" -> Repair
+                "print_studio" -> PrintStudio
+                "print_imposition" -> PrintStudio
                 else -> Tools
             }
         }
-        
+
         /**
          * Returns the route string for a given tool ID.
          * Used for navigation with parameters (e.g., image tools with operation).
@@ -125,7 +135,7 @@ sealed class Screen(val route: String) {
                 else -> fromToolId(toolId).route
             }
         }
-        
+
         /**
          * Returns the Screen object for a given feature title.
          * Used for legacy HomeScreen compatibility.
@@ -146,6 +156,8 @@ sealed class Screen(val route: String) {
                 "Unlock PDF" -> Unlock
                 "Repair PDF" -> Repair
                 "HTML to PDF" -> HtmlToPdf
+                "Doc to PDF" -> DocToPdf
+                "View Document" -> DocViewer
                 "Extract Text" -> ExtractText
                 "Add Watermark" -> Watermark
                 "Flatten PDF" -> Flatten
@@ -154,6 +166,8 @@ sealed class Screen(val route: String) {
                 "Annotate PDF" -> Annotate
                 "Scan to PDF" -> ScanToPdf
                 "OCR" -> Ocr
+                "Print Studio" -> PrintStudio
+                "Print & Imposition" -> PrintStudio
                 "Image Tools" -> ImageTools
                 else -> Tools
             }

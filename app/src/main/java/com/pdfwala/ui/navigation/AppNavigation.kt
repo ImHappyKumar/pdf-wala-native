@@ -2,19 +2,13 @@ package com.pdfwala.ui.navigation
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.pdfwala.R
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -129,6 +122,27 @@ private fun navigateToPdfViewer(
     }
 
     safeNavigate(navController, Screen.PdfViewer.createRoute(encodedUri, encodedName))
+}
+
+private fun navigateToDocViewer(
+    navController: NavHostController,
+    uri: Uri?,
+    name: String?
+) {
+    val uriString = uri?.toString().orEmpty()
+    if (uriString.isBlank()) {
+        android.util.Log.w("AppNavigation", "Doc viewer navigation skipped: empty URI")
+        return
+    }
+
+    val encodedUri = Uri.encode(uriString)
+    val encodedName = Uri.encode(name?.takeIf { it.isNotBlank() } ?: "Document")
+    if (encodedUri.isNullOrBlank() || encodedName.isNullOrBlank()) {
+        android.util.Log.w("AppNavigation", "Doc viewer navigation skipped: invalid encoded arguments")
+        return
+    }
+
+    safeNavigate(navController, Screen.DocViewer.createRoute(encodedUri, encodedName))
 }
 
 private fun navigateToPdfTool(
@@ -370,7 +384,9 @@ fun AppNavigation(
     modifier: Modifier = Modifier,
     startDestination: String = Screen.Tools.route,
     initialPdfUri: Uri? = null,
-    initialPdfName: String? = null
+    initialPdfName: String? = null,
+    initialDocUri: Uri? = null,
+    initialDocName: String? = null
 ) {
     val context = LocalContext.current
     val actualStartDestination = when {
@@ -387,6 +403,13 @@ fun AppNavigation(
                 // Pop up to Tools to avoid building up a large back stack
                 popUpTo(Screen.Tools.route) { inclusive = false }
             }
+        }
+    }
+
+    // External Word documents open straight in the document viewer
+    LaunchedEffect(initialDocUri) {
+        if (initialDocUri != null) {
+            navigateToDocViewer(navController, initialDocUri, initialDocName)
         }
     }
 
@@ -509,6 +532,9 @@ fun AppNavigation(
                         FilesScreen(
                             onOpenPdfViewer = { uri, name ->
                                 navigateToPdfViewer(navController, uri, name)
+                            },
+                            onOpenDocViewer = { uri, name ->
+                                navigateToDocViewer(navController, uri, name)
                             }
                         )
                     }
@@ -881,6 +907,46 @@ fun AppNavigation(
                     }
                 }
 
+                composable(Screen.DocToPdf.route) {
+                    DocToPdfScreen(
+                        onNavigateBack = { navController.popBackStack() },
+                        onOpenPdfViewer = { uri, name ->
+                            navigateToPdfViewer(navController, uri, name)
+                        }
+                    )
+                }
+
+                composable(
+                    route = Screen.DocViewer.route,
+                    arguments = listOf(
+                        navArgument("uri") {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        },
+                        navArgument("name") {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = "Document"
+                        }
+                    )
+                ) { backStackEntry ->
+                    val uriString = backStackEntry.arguments?.getString("uri") ?: ""
+                    val name = backStackEntry.arguments?.getString("name") ?: "Document"
+                    if (uriString.isEmpty()) {
+                        LaunchedEffect(Unit) { navController.popBackStack() }
+                    } else {
+                        DocxViewerScreen(
+                            uriString = Uri.decode(uriString),
+                            displayName = Uri.decode(name),
+                            onNavigateBack = { navController.popBackStack() },
+                            onOpenPdfViewer = { uri, pdfName ->
+                                navigateToPdfViewer(navController, uri, pdfName)
+                            }
+                        )
+                    }
+                }
+
                 // OCR screen - only available in Play Store flavor
                 if (BuildConfig.HAS_OCR) {
                     composable(Screen.Ocr.route) {
@@ -905,6 +971,12 @@ fun AppNavigation(
                             onNavigateBack = { navController.popBackStack() }
                         )
                     }
+                }
+
+                composable(Screen.PrintStudio.route) {
+                    com.pdfwala.ui.screens.imposition.PrintImpositionStudioScreen(
+                        onBack = { navController.popBackStack() }
+                    )
                 }
             }
         }

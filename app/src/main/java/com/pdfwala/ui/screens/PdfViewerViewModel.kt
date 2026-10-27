@@ -57,9 +57,15 @@ enum class AnnotationTool(val displayName: String) {
     NONE("Select"),
     HIGHLIGHTER("Highlighter"),
     MARKER("Marker"),
-    UNDERLINE("Underline"),
+    NOTE("Note"),
     ERASER("Eraser")
 }
+
+data class TextNote(
+    val text: String,
+    val x: Float,
+    val y: Float
+)
 
 data class AnnotationStroke(
     val pageIndex: Int,
@@ -98,6 +104,7 @@ sealed class PdfTool {
 sealed class PdfViewerUiState {
     object Idle : PdfViewerUiState()
     object Loading : PdfViewerUiState()
+    data class PasswordRequired(val isIncorrect: Boolean) : PdfViewerUiState()
     data class Error(val message: String) : PdfViewerUiState()
     data class Loaded(val totalPages: Int) : PdfViewerUiState()
 }
@@ -130,15 +137,15 @@ open class PdfViewerViewModel : ViewModel() {
     private val _annotations = MutableStateFlow<List<AnnotationStroke>>(emptyList())
     open val annotations: StateFlow<List<AnnotationStroke>> = _annotations.asStateFlow()
 
+    private val _textNotes = MutableStateFlow<Map<Int, List<TextNote>>>(emptyMap())
+    open val textNotes: StateFlow<Map<Int, List<TextNote>>> = _textNotes.asStateFlow()
+
     // Stroke width configurations for each drawing tool
     private val _highlighterWidth = MutableStateFlow(20f)
     open val highlighterWidth: StateFlow<Float> = _highlighterWidth.asStateFlow()
 
     private val _markerWidth = MutableStateFlow(8f)
     open val markerWidth: StateFlow<Float> = _markerWidth.asStateFlow()
-
-    private val _underlineWidth = MutableStateFlow(4f)
-    open val underlineWidth: StateFlow<Float> = _underlineWidth.asStateFlow()
 
     private val _eraserWidth = MutableStateFlow(15f)
     open val eraserWidth: StateFlow<Float> = _eraserWidth.asStateFlow()
@@ -149,10 +156,6 @@ open class PdfViewerViewModel : ViewModel() {
 
     fun setMarkerWidth(width: Float) {
         _markerWidth.value = width
-    }
-
-    fun setUnderlineWidth(width: Float) {
-        _underlineWidth.value = width
     }
 
     fun setEraserWidth(width: Float) {
@@ -174,7 +177,7 @@ open class PdfViewerViewModel : ViewModel() {
 
     // Search Job Control
     private var searchJob: Job? = null
-    
+
     // Page state tracking for error handling
     sealed class PageRenderState {
         object Idle : PageRenderState()
@@ -183,21 +186,21 @@ open class PdfViewerViewModel : ViewModel() {
         data class Error(val pageIndex: Int, val message: String) : PageRenderState()
     }
     private val _pageStates = MutableStateFlow<Map<Int, PageRenderState>>(emptyMap())
-    
+
     // Current page tracking for memory management
     private var _currentPage: Int = 0
-    
+
     // Safe bitmap lifecycle management - prevents recycled bitmap crashes
     private val activeBitmaps = Collections.synchronizedSet(mutableSetOf<Bitmap>())
     private val uiBitmapRefs = mutableMapOf<Int, Bitmap>()
-    
+
     private fun safeRecycle(bitmap: Bitmap?) {
         bitmap ?: return
         if (!bitmap.isRecycled && !activeBitmaps.contains(bitmap)) {
             bitmap.recycle()
         }
     }
-    
+
     private fun registerActiveBitmap(pageIndex: Int, bitmap: Bitmap) {
         if (bitmap.isRecycled) {
             Log.w("PdfViewerVM", "Skipping active registration for recycled bitmap on page $pageIndex")
@@ -220,7 +223,7 @@ open class PdfViewerViewModel : ViewModel() {
             uiBitmapRefs[pageIndex] = bitmap
         }
     }
-    
+
     private fun unregisterBitmap(pageIndex: Int) {
         synchronized(activeBitmaps) {
             uiBitmapRefs.remove(pageIndex)?.let { oldBitmap ->
@@ -278,13 +281,39 @@ open class PdfViewerViewModel : ViewModel() {
                         }
 
                         // Document open with timeout for large PDFs
+                        var wasPasswordAttempted = password.isNotEmpty()
                         val doc = withTimeoutOrNull(30000) {
-                            if (password.isNotEmpty()) {
-                                PDDocument.load(fileToLoad, password, MemoryUsageSetting.setupTempFileOnly())
-                            } else {
-                                PDDocument.load(fileToLoad, MemoryUsageSetting.setupTempFileOnly())
+                            try {
+                                if (password.isNotEmpty()) {
+                                    PDDocument.load(fileToLoad, password, MemoryUsageSetting.setupTempFileOnly())
+                                } else {
+                                    PDDocument.load(fileToLoad, MemoryUsageSetting.setupTempFileOnly())
+                                }
+                            } catch (e: Exception) {
+                                val msg = e.message?.lowercase() ?: ""
+                                if (msg.contains("password") || msg.contains("encrypted") || msg.contains("decrypt")) {
+                                    if (wasPasswordAttempted) {
+                                        Log.w("PdfViewerVM", "Password validation failed for file ${fileToLoad.name}")
+                                        _uiState.value = PdfViewerUiState.PasswordRequired(isIncorrect = true)
+                                    } else {
+                                        Log.i("PdfViewerVM", "Password required for encrypted file ${fileToLoad.name}")
+                                        _uiState.value = PdfViewerUiState.PasswordRequired(isIncorrect = false)
+                                    }
+                                    return@withTimeoutOrNull null
+                                } else {
+                                    throw e
+                                }
                             }
-                        } ?: throw Exception("PDF too large to open - timed out after 30 seconds")
+                        }
+
+                        if (doc == null) {
+                            // If doc is null and uiState was set to PasswordRequired, we return early cleanly
+                            if (_uiState.value is PdfViewerUiState.PasswordRequired) {
+                                return@withContext
+                            } else {
+                                throw Exception("PDF too large to open - timed out after 30 seconds")
+                            }
+                        }
 
                         val pageCount = doc.numberOfPages
                         Log.d("PdfViewerVM", "Loaded PDF with $pageCount pages")
@@ -293,12 +322,41 @@ open class PdfViewerViewModel : ViewModel() {
                             document = doc
                             pdfRenderer = PDFRenderer(doc)
                             tempFile = createdTempFile // Transfer ownership to instance
-                            try {
-                                androidPdfPfd = ParcelFileDescriptor.open(fileToLoad, ParcelFileDescriptor.MODE_READ_ONLY)
-                                androidPdfRenderer = AndroidPdfRenderer(androidPdfPfd!!)
-                            } catch (e: Exception) {
-                                Log.e("PdfViewerVM", "Error initializing AndroidPdfRenderer", e)
+                            if (!doc.isEncrypted) {
+                                try {
+                                    androidPdfPfd = ParcelFileDescriptor.open(fileToLoad, ParcelFileDescriptor.MODE_READ_ONLY)
+                                    androidPdfRenderer = AndroidPdfRenderer(androidPdfPfd!!)
+                                } catch (e: Exception) {
+                                    Log.e("PdfViewerVM", "Error initializing AndroidPdfRenderer", e)
+                                }
+                            } else {
+                                Log.i("PdfViewerVM", "Document is encrypted. Using PDFBox PDFRenderer for proper font/stream decryption.")
                             }
+                        }
+
+                        try {
+                            val existing = mutableMapOf<Int, List<TextNote>>()
+                            for (i in 0 until pageCount) {
+                                val pg = doc.getPage(i)
+                                val w = pg.mediaBox?.width ?: 612f
+                                val h = pg.mediaBox?.height ?: 792f
+                                val notes = pg.annotations
+                                    ?.filterIsInstance<com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAnnotationText>()
+                                    ?.mapNotNull { ann ->
+                                        val contents = ann.contents ?: return@mapNotNull null
+                                        if (contents.isBlank()) return@mapNotNull null
+                                        val rect = ann.rectangle ?: return@mapNotNull null
+                                        TextNote(
+                                            text = contents,
+                                            x = (rect.lowerLeftX / w).coerceIn(0f, 1f),
+                                            y = (1f - (rect.upperRightY / h)).coerceIn(0f, 1f)
+                                        )
+                                    } ?: emptyList()
+                                if (notes.isNotEmpty()) existing[i] = notes
+                            }
+                            _textNotes.value = existing
+                        } catch (e: Exception) {
+                            Log.w("PdfViewerVM", "Failed to load existing notes", e)
                         }
 
                         _currentPage = savedPage.coerceIn(0, pageCount - 1)
@@ -315,18 +373,18 @@ open class PdfViewerViewModel : ViewModel() {
             }
         }
     }
-    
+
     // Update current page for memory management
     fun updateCurrentPage(pageIndex: Int) {
         _currentPage = pageIndex
     }
-    
+
     // Retry a failed page render
     fun retryPage(pageIndex: Int) {
         unregisterBitmap(pageIndex)
         bitmapCache.remove(pageIndex)
     }
-    
+
     fun getPageState(pageIndex: Int): PageRenderState {
         return _pageStates.value[pageIndex] ?: PageRenderState.Idle
     }
@@ -377,33 +435,86 @@ open class PdfViewerViewModel : ViewModel() {
         _annotations.value = currentList
     }
 
-fun undoAnnotation() {
-    if (_annotations.value.size > 500) throw OutOfMemoryError("PDF has too many annotations to process at once")
-    val currentList = _annotations.value.toMutableList()
-    if (currentList.isNotEmpty()) {
-        currentList.removeAt(currentList.lastIndex)
-        _annotations.value = currentList
-    }
-}
-
-fun eraseAnnotations(pageIndex: Int, eraserPoints: List<Offset>, eraserNormWidth: Float) {
-    val currentList = _annotations.value.toMutableList()
-    val threshold = (eraserNormWidth * 3f).coerceAtLeast(0.01f)
-    currentList.removeAll { stroke ->
-        if (stroke.pageIndex != pageIndex) return@removeAll false
-        stroke.points.any { sp ->
-            eraserPoints.any { ep ->
-                val dx = sp.x - ep.x
-                val dy = sp.y - ep.y
-                dx * dx + dy * dy < threshold * threshold
+    fun undoAnnotation() {
+        if (_annotations.value.size > 500) throw OutOfMemoryError("PDF has too many annotations to process at once")
+        val currentList = _annotations.value.toMutableList()
+        if (currentList.isNotEmpty()) {
+            currentList.removeAt(currentList.lastIndex)
+            _annotations.value = currentList
+            return
+        }
+        val notes = _textNotes.value.toMutableMap()
+        for ((pageIndex, list) in notes.toList().asReversed()) {
+            if (list.isNotEmpty()) {
+                notes[pageIndex] = list.dropLast(1)
+                if (notes[pageIndex].isNullOrEmpty()) notes.remove(pageIndex)
+                _textNotes.value = notes
+                return
             }
         }
     }
-    _annotations.value = currentList
-}
+
+    fun eraseAnnotations(pageIndex: Int, eraserPoints: List<Offset>, eraserNormWidth: Float) {
+        val currentList = _annotations.value.toMutableList()
+        val threshold = (eraserNormWidth * 3f).coerceAtLeast(0.01f)
+        currentList.removeAll { stroke ->
+            if (stroke.pageIndex != pageIndex) return@removeAll false
+            stroke.points.any { sp ->
+                eraserPoints.any { ep ->
+                    val dx = sp.x - ep.x
+                    val dy = sp.y - ep.y
+                    dx * dx + dy * dy < threshold * threshold
+                }
+            }
+        }
+        _annotations.value = currentList
+        val notes = _textNotes.value[pageIndex] ?: return
+        val remaining = notes.filter { note ->
+            eraserPoints.none { ep ->
+                val dx = note.x - ep.x
+                val dy = note.y - ep.y
+                dx * dx + dy * dy < threshold * threshold
+            }
+        }
+        if (remaining.size != notes.size) {
+            val updated = _textNotes.value.toMutableMap()
+            if (remaining.isEmpty()) updated.remove(pageIndex) else updated[pageIndex] = remaining
+            _textNotes.value = updated
+        }
+    }
 
     fun clearAnnotations() {
         _annotations.value = emptyList()
+        _textNotes.value = emptyMap()
+    }
+
+    fun addTextNote(pageIndex: Int, x: Float, y: Float, text: String) {
+        if (text.isBlank()) return
+        val updated = _textNotes.value.toMutableMap()
+        val list = updated[pageIndex]?.toMutableList() ?: mutableListOf()
+        list.add(TextNote(text.trim(), x.coerceIn(0f, 1f), y.coerceIn(0f, 1f)))
+        updated[pageIndex] = list
+        _textNotes.value = updated
+    }
+
+    fun updateTextNote(pageIndex: Int, index: Int, newText: String) {
+        val list = _textNotes.value[pageIndex] ?: return
+        if (index !in list.indices) return
+        val updated = _textNotes.value.toMutableMap()
+        val mutable = list.toMutableList()
+        mutable[index] = mutable[index].copy(text = newText.trim())
+        updated[pageIndex] = mutable
+        _textNotes.value = updated
+    }
+
+    fun deleteTextNote(pageIndex: Int, index: Int) {
+        val list = _textNotes.value[pageIndex] ?: return
+        if (index !in list.indices) return
+        val updated = _textNotes.value.toMutableMap()
+        val mutable = list.toMutableList()
+        mutable.removeAt(index)
+        if (mutable.isEmpty()) updated.remove(pageIndex) else updated[pageIndex] = mutable
+        _textNotes.value = updated
     }
 
     // Bitmap cache dynamically sized to 1/8th of the device's maximum available heap memory
@@ -418,14 +529,14 @@ fun eraseAnnotations(pageIndex: Int, eraserPoints: List<Offset>, eraserNormWidth
         override fun sizeOf(key: Int, bitmap: Bitmap): Int {
             return bitmap.byteCount
         }
-        
+
         override fun entryRemoved(evicted: Boolean, key: Int, oldValue: Bitmap, newValue: Bitmap?) {
             if (oldValue !== newValue && !activeBitmaps.contains(oldValue)) {
                 safeRecycle(oldValue)
             }
         }
     }
-    
+
     private var loadJob: Job? = null
 
     private fun calculateCappedRenderScale(pageIndex: Int): Float {
@@ -441,7 +552,7 @@ fun eraseAnnotations(pageIndex: Int, eraserPoints: List<Offset>, eraserNormWidth
             RENDER_SCALE
         }
     }
-    
+
     suspend fun loadPage(pageIndex: Int): Bitmap? {
         val totalPages = (_uiState.value as? PdfViewerUiState.Loaded)?.totalPages ?: return null
         if (pageIndex < 0 || pageIndex >= totalPages) return null
@@ -580,7 +691,7 @@ fun eraseAnnotations(pageIndex: Int, eraserPoints: List<Offset>, eraserNormWidth
                     .map { it.trim() }
                     .filter { it.isNotBlank() }
                     .joinToString("\n")
-                
+
                 PageTextData(cleanedText, textPositions)
             }
             if (pageData != null) {
@@ -752,6 +863,7 @@ fun eraseAnnotations(pageIndex: Int, eraserPoints: List<Offset>, eraserNormWidth
 
     fun saveAnnotations(context: Context, outputUri: Uri) {
         val currentAnnotations = _annotations.value
+        val currentNotes = _textNotes.value
 
         val exceptionHandler = kotlinx.coroutines.CoroutineExceptionHandler { _, e ->
             if (e is OutOfMemoryError) {
@@ -784,10 +896,11 @@ fun eraseAnnotations(pageIndex: Int, eraserPoints: List<Offset>, eraserNormWidth
                         yield() // Bolt: Allow UI updates
 
                         val pageAnnotations = currentAnnotations.filter { it.pageIndex == pageIndex }
+                        val pageNotes = currentNotes[pageIndex] ?: emptyList()
                         val sourcePage = sourceDoc.getPage(pageIndex)
                         val rotation = sourcePage.rotation
 
-                        if (pageAnnotations.isEmpty()) {
+                        if (pageAnnotations.isEmpty() && pageNotes.isEmpty()) {
                             // OPTIMIZATION: Fast copy for pages without annotations
                             val importedPage = destDoc.importPage(sourcePage)
                             // PDDocument.importPage returns the imported page, which belongs to destDoc but isn't added yet
@@ -843,6 +956,9 @@ fun eraseAnnotations(pageIndex: Int, eraserPoints: List<Offset>, eraserNormWidth
                                         cs.stroke()
                                     }
                                 }
+                            }
+                            if (pageNotes.isNotEmpty()) {
+                                addTextNotesToPage(importedPage, pageNotes)
                             }
                         } else {
                             // RASTER FALLBACK: For rotated pages, use safer bitmap rasterization to guarantee alignment
@@ -953,6 +1069,9 @@ fun eraseAnnotations(pageIndex: Int, eraserPoints: List<Offset>, eraserNormWidth
                                     PDPageContentStream(destDoc, page).use { cs ->
                                         cs.drawImage(pdImage, 0f, 0f, pageWidth, pageHeight)
                                     }
+                                    if (pageNotes.isNotEmpty()) {
+                                        addTextNotesToPage(page, pageNotes)
+                                    }
                                 } finally {
                                     // Safe recycle - check if bitmap is still in use by UI
                                     safeRecycle(workingBitmap)
@@ -983,12 +1102,46 @@ fun eraseAnnotations(pageIndex: Int, eraserPoints: List<Offset>, eraserNormWidth
         }
     }
 
+    private fun addTextNotesToPage(page: PDPage, notes: List<TextNote>) {
+        try {
+            val w = page.mediaBox?.width ?: 612f
+            val h = page.mediaBox?.height ?: 792f
+            val existing = page.annotations?.filter {
+                it !is com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAnnotationText
+            }?.toMutableList() ?: mutableListOf()
+            notes.forEach { note ->
+                if (note.text.isBlank()) return@forEach
+                val ann = com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAnnotationText()
+                ann.contents = note.text
+                ann.setName(com.tom_roush.pdfbox.pdmodel.interactive.annotation.PDAnnotationText.NAME_COMMENT)
+                ann.color = com.tom_roush.pdfbox.pdmodel.graphics.color.PDColor(
+                    floatArrayOf(1f, 1f, 0f),
+                    com.tom_roush.pdfbox.pdmodel.graphics.color.PDDeviceRGB.INSTANCE
+                )
+                val sizeVal = 20f
+                val pdfX = note.x * w
+                val pdfY = (1f - note.y) * h
+                val rect = com.tom_roush.pdfbox.pdmodel.common.PDRectangle()
+                rect.lowerLeftX = pdfX
+                rect.lowerLeftY = pdfY - sizeVal
+                rect.upperRightX = pdfX + sizeVal
+                rect.upperRightY = pdfY
+                ann.rectangle = rect
+                existing.add(ann)
+            }
+            page.annotations = existing
+        } catch (e: Exception) {
+            Log.w("PdfViewerVM", "Failed to write text notes", e)
+        }
+    }
+
     private suspend fun closeDocument() {
         documentMutex.withLock {
             try {
                 // Clear any in-memory bitmap/page cache
                 bitmapCache.evictAll()
                 _annotations.value = emptyList()
+                _textNotes.value = emptyMap()
                 extractedTextCache.clear()
 
                 // GC Hint
@@ -998,21 +1151,21 @@ fun eraseAnnotations(pageIndex: Int, eraserPoints: List<Offset>, eraserNormWidth
             } catch (e: Throwable) {
                 Log.e("PdfViewerVM", "Error closing document", e)
             } finally {
-                 document = null
-                 pdfRenderer = null
-                 try {
-                     androidPdfRenderer?.close()
-                     androidPdfRenderer = null
-                 } catch (e: Exception) {}
-                 try {
-                     androidPdfPfd?.close()
-                     androidPdfPfd = null
-                 } catch (e: Exception) {}
-                 extractedTextCache.clear()
-                 // When navigating away from a PDF, trim cache to 0 immediately
-                 bitmapCache.trimToSize(0)
-                 
-                 // Clean up temp file
+                document = null
+                pdfRenderer = null
+                try {
+                    androidPdfRenderer?.close()
+                    androidPdfRenderer = null
+                } catch (e: Exception) {}
+                try {
+                    androidPdfPfd?.close()
+                    androidPdfPfd = null
+                } catch (e: Exception) {}
+                extractedTextCache.clear()
+                // When navigating away from a PDF, trim cache to 0 immediately
+                bitmapCache.trimToSize(0)
+
+                // Clean up temp file
                 try {
                     if (tempFile?.exists() == true) {
                         tempFile?.delete()

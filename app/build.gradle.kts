@@ -33,6 +33,8 @@ android {
         buildConfigField("boolean", "HAS_OCR", "true")
         buildConfigField("boolean", "USE_MLKIT_OCR", "true")
         buildConfigField("boolean", "HAS_NETWORK_URL_TO_PDF", "true")
+        buildConfigField("boolean", "HAS_MLKIT_SCANNER", "true")
+        buildConfigField("boolean", "HAS_MLKIT_SCANNER", "true")
     }
 
     signingConfigs {
@@ -63,6 +65,11 @@ android {
             isDebuggable = false
             isJniDebuggable = false
 
+            // Bundle debug symbols in the AAB for Play Console crash reports.
+            // NOTE: Play shows "missing debug symbols" if an APK (or a non-CI
+            // local build) is uploaded instead of the CI-built AAB. Always ship
+            // the bundle from deploy.yml; the matching native-debug-symbols.zip
+            // is published as a workflow artifact for manual upload if needed.
             ndk {
                 debugSymbolLevel = "FULL"
             }
@@ -107,6 +114,12 @@ android {
             excludes += "META-INF/LICENSE.md"
             excludes += "META-INF/NOTICE.md"
             excludes += "META-INF/versions/9/module-info.class"
+            excludes += "META-INF/LICENSE.txt"
+            excludes += "META-INF/NOTICE.txt"
+            excludes += "META-INF/*.SF"
+            excludes += "META-INF/*.DSA"
+            excludes += "META-INF/*.RSA"
+            excludes += "org/bouncycastle/pqc/**"
         }
         // 16 KB page alignment: store native libs uncompressed & page-aligned
         jniLibs {
@@ -162,6 +175,11 @@ dependencies {
     // PDF Tools - PdfBox-Android for PDF manipulation
     implementation("com.tom-roush:pdfbox-android:2.0.27.0")
 
+    // Office documents: DOCX view + DOCX-to-PDF (Apache 2.0, FOSS-safe all flavors)
+    implementation("org.apache.poi:poi:5.2.5")
+    implementation("org.apache.poi:poi-ooxml:5.2.5")
+    implementation("org.apache.poi:poi-scratchpad:5.2.5")
+
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     
@@ -174,6 +192,7 @@ dependencies {
     implementation("androidx.camera:camera-view:$cameraxVersion")
 
     implementation("com.google.mlkit:text-recognition:16.0.1")
+    implementation("com.google.android.gms:play-services-mlkit-document-scanner:16.0.0")
     implementation("com.google.android.play:review:2.0.1")
     
     // Coil for image loading (Apache 2.0) - lightweight (~2MB)

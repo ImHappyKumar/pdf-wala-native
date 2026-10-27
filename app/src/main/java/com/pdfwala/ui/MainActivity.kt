@@ -71,6 +71,8 @@ class MainActivity : AppCompatActivity() {
     private var pendingPdfUri: Uri? = null
     private var pendingPdfName: String? = null
     private var pendingIsLoading: Boolean = false
+    private var pendingDocUri: Uri? = null
+    private var pendingDocName: String? = null
 
     /*
      * Compose state holders for handling incoming PDF
@@ -78,12 +80,12 @@ class MainActivity : AppCompatActivity() {
      */
     private var pdfUriState:
             androidx.compose.runtime.MutableState<Uri?>? = null
-
     private var pdfNameState:
             androidx.compose.runtime.MutableState<String?>? = null
-
     private var isLoadingState:
             androidx.compose.runtime.MutableState<Boolean>? = null
+    private var docUriState: androidx.compose.runtime.MutableState<Uri?>? = null
+    private var docNameState: androidx.compose.runtime.MutableState<String?>? = null
 
     /*
      * Compose state reference used by onResume() to show
@@ -205,16 +207,16 @@ class MainActivity : AppCompatActivity() {
                         remember {
                             mutableStateOf(pendingPdfUri)
                         }
-
                     val pdfName =
                         remember {
                             mutableStateOf(pendingPdfName)
                         }
-
                     val isLoading =
                         remember {
                             mutableStateOf(pendingIsLoading)
                         }
+                    val docUri = remember { mutableStateOf(pendingDocUri) }
+                    val docName = remember { mutableStateOf(pendingDocName) }
 
                     /*
                      * Store references so onNewIntent()
@@ -222,6 +224,8 @@ class MainActivity : AppCompatActivity() {
                      */
                     pdfUriState = pdfUri
                     pdfNameState = pdfName
+                    docUriState = docUri
+                    docNameState = docName
                     isLoadingState = isLoading
 
                     /**
@@ -320,8 +324,9 @@ class MainActivity : AppCompatActivity() {
                                 Modifier.fillMaxSize(),
                             initialPdfUri =
                                 pdfUri.value,
-                            initialPdfName =
-                                pdfName.value
+                            initialPdfName = pdfName.value,
+                            initialDocUri = docUri.value,
+                            initialDocName = docName.value
                         )
                     }
                 }
@@ -673,6 +678,8 @@ class MainActivity : AppCompatActivity() {
          */
         pendingPdfUri = null
         pendingPdfName = null
+        pendingDocUri = null
+        pendingDocName = null
 
         /*
          * Handle the new incoming PDF intent.
@@ -694,19 +701,14 @@ class MainActivity : AppCompatActivity() {
          * Update Compose state so the new PDF
          * is reflected immediately.
          */
-        Log.d(
-            TAG,
-            "onNewIntent: Updating Compose state " +
-                    "with PDF=$pendingPdfUri, " +
-                    "Loading=$pendingIsLoading"
-        )
+        Log.d(TAG, "onNewIntent: Updating Compose state with PDF=$pendingPdfUri, DOC=$pendingDocUri, Loading=$pendingIsLoading")
 
         pdfUriState?.value =
             pendingPdfUri
-
         pdfNameState?.value =
             pendingPdfName
-
+        docUriState?.value = pendingDocUri
+        docNameState?.value = pendingDocName
         isLoadingState?.value =
             pendingIsLoading
     }
@@ -831,6 +833,29 @@ class MainActivity : AppCompatActivity() {
                     "fileName: $fileName, " +
                     "action: ${intent.action}"
         )
+
+        // Word documents open in the document viewer
+        if (isWordUri(originalUri, mimeType)) {
+            if (intent.action == Intent.ACTION_VIEW || intent.action == Intent.ACTION_SEND) {
+                val accessibleUri = runBlocking(Dispatchers.IO) {
+                    copyToCacheSynchronous(originalUri, fileName)
+                }
+                pendingIsLoading = false
+                isLoadingState?.value = false
+                if (accessibleUri == null) {
+                    Log.e(TAG, "Could not obtain access to URI: $originalUri - file will not be opened")
+                } else {
+                    pendingDocUri = accessibleUri
+                    pendingDocName = fileName
+                    docUriState?.value = accessibleUri
+                    docNameState?.value = fileName
+                    activityScope.launch(Dispatchers.IO) {
+                        SafUriManager.addRecentFile(applicationContext, accessibleUri, intent.flags, customName = fileName)
+                    }
+                }
+            }
+            return
+        }
 
         /*
          * Only PDF files are handled.
@@ -1541,6 +1566,19 @@ class MainActivity : AppCompatActivity() {
                 ".pdf",
                 ignoreCase = true
             )
+    }
+
+    /**
+     * Check if the URI points to a Word document.
+     */
+    private fun isWordUri(uri: Uri, mimeType: String?): Boolean {
+        if (mimeType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+            mimeType == "application/msword"
+        ) return true
+
+        val uriString = uri.toString()
+        return uriString.endsWith(".docx", ignoreCase = true) ||
+                uriString.endsWith(".doc", ignoreCase = true)
     }
 
     /**

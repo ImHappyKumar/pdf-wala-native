@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
     <!-- App -->
     <string name="app_name">PDF Wala</string>
@@ -147,6 +147,8 @@
     <string name="tool_merge_pdf">Merge PDF</string>
     <string name="tool_extract_pages">Extract Pages</string>
     <string name="tool_scan_to_pdf">Scan to PDF</string>
+    <string name="tool_doc_to_pdf">Doc to PDF</string>
+    <string name="tool_view_doc">View Document</string>
     <string name="tool_image_compress">Compress Image</string>
     <string name="tool_image_resize">Resize Image</string>
     <string name="tool_image_convert">Convert Image</string>
@@ -165,7 +167,51 @@
     <string name="desc_html_to_pdf">Convert a webpage or HTML content to PDF</string>
     <string name="desc_extract_text">Extract text from a PDF and save it as a text file</string>
     <string name="desc_scan_to_pdf">Scan documents with your camera and create a PDF</string>
+    <string name="desc_doc_to_pdf">Convert Word documents to PDF</string>
+    <string name="desc_view_doc">Open and read Word documents</string>
     <string name="desc_ocr">Recognize text in scanned pages so you can search and copy it</string>
+    <!-- Document Viewer / Doc to PDF -->
+    <string name="doc_viewer">Document Viewer</string>
+    <string name="doc_loading">Loading document…</string>
+    <string name="doc_load_error">Document Read Error</string>
+    <string name="doc_legacy_readonly">Read-only legacy .doc format. Convert to .docx for full fidelity.</string>
+    <string name="doc_search">Search</string>
+    <string name="doc_search_hint">Search text in document…</string>
+    <string name="doc_no_matches">No matches</string>
+    <string name="doc_reflow">Reflow</string>
+    <string name="doc_print_layout">Print Layout</string>
+    <string name="doc_share">Share</string>
+    <string name="doc_share_failed">Could not share document</string>
+    <string name="doc_open_in">Open in…</string>
+    <string name="doc_no_app_found">No app found to open this document</string>
+    <string name="doc_export_pdf">Export to PDF</string>
+    <string name="doc_exporting">Exporting PDF</string>
+    <string name="doc_printing">Preparing print</string>
+    <string name="doc_converting">Converting document offline…</string>
+    <string name="doc_export_success">Document exported to PDF successfully!</string>
+    <string name="doc_print">Print</string>
+    <string name="doc_print_failed">Print failed</string>
+    <string name="doc_print_unsupported">Printing is not supported for legacy .doc files</string>
+    <string name="doc_pick_file">Select Word document</string>
+    <string name="doc_no_file">No document selected</string>
+    <string name="doc_convert">Convert to PDF</string>
+    <string name="doc_convert_done">PDF created successfully!</string>
+    <string name="doc_open_pdf">Open PDF</string>
+    <string name="doc_save_copy">Save copy to custom location…</string>
+    <string name="doc_unsupported">Only .docx and .doc files are supported</string>
+    <string name="doc_access_expired">Access to this file expired. Please open it again from storage.</string>
+
+    <!-- Tools search & favorites -->
+    <string name="tools_search_hint">Search tools…</string>
+    <string name="tools_favorites">Favorites</string>
+    <string name="tools_search_results">Results</string>
+    <string name="tools_search_empty">No tools match your search</string>
+    <string name="tools_add_favorite">Add to favorites</string>
+    <string name="tools_remove_favorite">Remove from favorites</string>
+
+    <!-- Smart Scan (ML Kit, Play flavor) -->
+    <string name="scan_smart_scan">Smart Scan (Auto Borders)</string>
+    <string name="scan_smart_scan_hint">Automatically detects page edges with editable borders and saves straight to PDF.</string>
     <string name="desc_image_tools">Compress, resize, convert, or remove metadata from images</string>
     <string name="desc_sign_pdf">Add your signature to a PDF</string>
     <string name="desc_fill_forms">Fill in interactive PDF form fields</string>
@@ -189,19 +235,25 @@
     <string name="tool_view_pdf">View PDF</string>
 
     <!-- Merge PDF -->
-    <string name="merge_title">Merge PDFs</string>
-    <string name="merge_empty_subtitle">Select at least two PDF files to merge</string>
+    <string name="merge_title">Merge PDF &amp; Images</string>
+    <string name="merge_empty_subtitle">Add PDF files or images (JPG, PNG, WEBP) to merge into a single PDF document</string>
     <string name="merge_selected_files">Selected PDFs (%d)</string>
     <string name="merge_add_pdfs">Add PDF files</string>
+    <string name="merge_add_images">Add Images</string>
+    <string name="merge_add_files">Add Files</string>
     <string name="merge_n_pdfs">Merge %d PDFs</string>
-    <string name="merge_progress">Merging PDFs…</string>
+    <string name="merge_n_files">Merge %d Files</string>
+    <string name="merge_progress">Merging Files...</string>
     <string name="merge_complete">PDFs merged</string>
     <string name="merge_failed">Couldn\'t merge the selected PDFs</string>
-    <string name="merge_success_message">Merged %1$d PDFs successfully.\n\nSaved to: %2$s/%3$s</string>
+    <string name="merge_success_message">Merged %1$d files successfully.\n\nSaved to: %2$s/%3$s</string>
     <string name="merge_custom_location">Choose where to save the file</string>
     <string name="merge_default_path">Default location: %s</string>
     <string name="merge_details_count">Merged %1$d PDF files</string>
     <string name="merge_success_count">Successfully merged %1$d PDFs</string>
+    <string name="merge_file_view">File View</string>
+    <string name="merge_page_view">Page View</string>
+    <string name="merge_page_indicator">Page %1$d</string>
 
     <!-- Compress PDF -->
     <string name="compress_title">Compress PDF</string>
@@ -306,6 +358,11 @@
     <string name="pdf_highlighter">Highlighter</string>
     <string name="pdf_marker">Marker</string>
     <string name="pdf_underline">Underline</string>
+    <string name="pdf_note">Note</string>
+    <string name="pdf_add_note">Add Text Note</string>
+    <string name="pdf_edit_note">Edit Comment</string>
+    <string name="pdf_note_hint">Type comment…</string>
+    <string name="pdf_place_note">Place Note</string>
     <string name="pdf_clear_annotations_confirm">All annotations will be removed. This action cannot be undone.</string>
     <string name="pdf_annotations_saved">Annotations saved.</string>
     <string name="pdf_enter_password">Enter password</string>
@@ -564,6 +621,10 @@
     <string name="fill_fields_updated">%1$d fields updated</string>
     <string name="fill_no_editable_fields">This form has no editable fields</string>
 
+    <!-- Print & Imposition Studio -->
+    <string name="tool_print_studio">Print Studio</string>
+    <string name="desc_print_studio">Booklets, N-up grids, cards, bleeds and crop marks</string>
+
     <!-- HTML to PDF -->
     <string name="html_title">HTML to PDF</string>
     <string name="html_from_url">Web address</string>
@@ -684,4 +745,61 @@
     <string name="extract_to_text_file">Extract to Text File</string>
     <string name="extract_complete">Extraction Complete</string>
     <string name="extract_success_message">Text extracted successfully!\n\nCharacters: %1$d\nWords: %2$d\nPages: %3$d</string>
+
+
+<!--    Temporary Strings-->
+    <string name="merge_empty_title">No Files Selected</string>
+    <string name="action_previous">Previous</string>
+    <string name="action_settings">Settings</string>
+    <string name="cd_open_pdf">Open PDF</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_next_result">Next</string>
+    <string name="home_title">PDF Toolkit</string>
+    <string name="fab_open_pdf">Open PDF</string>
+    <string name="nav_tab_tools">Tools</string>
+    <string name="nav_tab_files">Files</string>
+    <string name="nav_open_history">Open History</string>
+    <string name="category_markup">Markup</string>
+    <string name="category_image_tools">Image Tools</string>
+    <string name="tool_merge_pdfs">Merge PDFs</string>
+    <string name="tool_split_pdf">Split PDF</string>
+    <string name="tool_organize_pages">Organize Pages</string>
+    <string name="tool_rotate_pages">Rotate Pages</string>
+    <string name="tool_reorder_pages">Reorder Pages</string>
+    <string name="tool_delete_pages">Delete Pages</string>
+    <string name="tool_images_to_pdf">Images to PDF</string>
+    <string name="tool_pdf_to_images">PDF to Images</string>
+    <string name="tool_html_to_pdf">HTML to PDF</string>
+    <string name="tool_extract_text">Extract Text</string>
+    <string name="tool_ocr">OCR</string>
+    <string name="tool_image_tools">Image Tools</string>
+    <string name="tool_sign_pdf">Sign PDF</string>
+    <string name="tool_fill_forms">Fill Forms</string>
+    <string name="tool_annotate_pdf">Annotate PDF</string>
+    <string name="tool_add_security">Add Security</string>
+    <string name="tool_add_watermark">Add Watermark</string>
+    <string name="tool_flatten_pdf">Flatten PDF</string>
+    <string name="tool_compress_pdf">Compress PDF</string>
+    <string name="tool_repair_pdf">Repair PDF</string>
+    <string name="tool_page_numbers">Page Numbers</string>
+    <string name="compress_select_pdf">Select PDF</string>
+    <string name="split_all_pages">All Pages</string>
+    <string name="pdf_search">Search</string>
+    <string name="pdf_save">Save</string>
+    <string name="pdf_clear_annotations">Clear annotations?</string>
+    <string name="pdf_page_number">Page number</string>
+    <string name="settings_section_quality">Quality Settings</string>
+    <string name="settings_request_feature">Request a Feature</string>
+    <string name="settings_licenses">Open Source Licenses</string>
+    <string name="settings_about_version">Version</string>
+    <string name="settings_about_build">Build</string>
+    <string name="settings_app_name">PDF Wala</string>
+    <string name="error_password_required">Password required</string>
+    <string name="file_picker_select_pdf">Select PDF</string>
+    <string name="file_picker_select_image">Select Image</string>
+    <string name="action_done_editing">Done Editing</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_go_back">Go Back</string>
+    <string name="metadata_no_pdf_selected">No PDF Selected</string>
+    <string name="action_select_none">None</string>
 </resources>

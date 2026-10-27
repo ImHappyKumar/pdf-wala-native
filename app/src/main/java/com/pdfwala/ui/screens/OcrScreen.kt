@@ -42,37 +42,88 @@ import kotlinx.coroutines.launch
 class OcrViewModel : ViewModel() {
     private val _state = MutableStateFlow(OcrUiState())
     val state: StateFlow<OcrUiState> = _state.asStateFlow()
-    
+
     private var ocrProcessor: PdfOcrProcessor? = null
-    
+
     fun setSourcePdf(uri: Uri, name: String) {
-        _state.value = _state.value.copy(sourceUri = uri, sourceName = name)
+        _state.value = _state.value.copy(sourceUri = uri, sourceName = name, sourceIsImage = false)
     }
-    
+
+    fun setSourceImage(uri: Uri, name: String) {
+        _state.value = _state.value.copy(sourceUri = uri, sourceName = name, sourceIsImage = true)
+    }
+
     fun setMode(mode: OcrMode) {
         _state.value = _state.value.copy(mode = mode)
+    }
+
+    fun restoreSettings(context: android.content.Context) {
+        viewModelScope.launch {
+            val saved = com.pdfwala.util.ToolSettingsStore
+                .loadString(context, "ocr", "mode")
+                ?.let { runCatching { OcrMode.valueOf(it) }.getOrNull() }
+            _state.value = _state.value.copy(
+                mode = saved ?: _state.value.mode,
+                settingsRestored = true
+            )
+        }
+    }
+
+    fun persistSettings(context: android.content.Context) {
+        if (!_state.value.settingsRestored) return
+        viewModelScope.launch {
+            com.pdfwala.util.ToolSettingsStore.saveString(
+                context, "ocr", "mode", _state.value.mode.name
+            )
+        }
     }
 
     fun setViewFormat(format: OcrViewFormat) {
         _state.value = _state.value.copy(viewFormat = format)
     }
-    
+
     fun extractText(context: android.content.Context) {
         if (_state.value.isProcessing) return
         val sourceUri = _state.value.sourceUri ?: return
-        
+        val isImage = _state.value.sourceIsImage
+
         viewModelScope.launch {
             _state.value = _state.value.copy(isProcessing = true, progress = 0, error = null)
-            
+
             ocrProcessor = PdfOcrProcessor(context)
-            
+
+            if (isImage) {
+                try {
+                    val outcome = ocrProcessor?.extractTextFromImage(sourceUri)
+                    val text = outcome?.text ?: ""
+                    _state.value = _state.value.copy(
+                        isProcessing = false,
+                        isComplete = text.isNotBlank(),
+                        error = if (text.isBlank()) {
+                            "No text recognized in this image" +
+                                    (outcome?.debug?.let { "\n$it" } ?: "")
+                        } else null,
+                        extractedText = text,
+                        markdownText = text,
+                        pagesProcessed = 1
+                    )
+                } catch (e: Exception) {
+                    if (e is kotlinx.coroutines.CancellationException) throw e
+                    _state.value = _state.value.copy(
+                        isProcessing = false,
+                        error = "Image OCR failed: ${e.message}"
+                    )
+                }
+                return@launch
+            }
+
             val result = ocrProcessor?.extractTextWithOcr(
                 pdfUri = sourceUri,
                 progressCallback = { progress ->
                     _state.value = _state.value.copy(progress = progress)
                 }
             )
-            
+
             _state.value = _state.value.copy(
                 isProcessing = false,
                 isComplete = result?.success == true,
@@ -83,30 +134,41 @@ class OcrViewModel : ViewModel() {
             )
         }
     }
-    
+
     fun makeSearchable(
         context: android.content.Context,
         outputUri: Uri
     ) {
         if (_state.value.isProcessing) return
         val sourceUri = _state.value.sourceUri ?: return
-        
+        val isImage = _state.value.sourceIsImage
+
         viewModelScope.launch {
             _state.value = _state.value.copy(isProcessing = true, progress = 0, error = null)
-            
+
             ocrProcessor = PdfOcrProcessor(context)
-            
-            val result = ocrProcessor?.makeSearchable(
-                inputUri = sourceUri,
-                outputUri = outputUri,
-                progressCallback = { progress ->
-                    _state.value = _state.value.copy(progress = progress)
-                }
-            )
-            
+
+            val result = if (isImage) {
+                ocrProcessor?.makeImageSearchable(
+                    imageUri = sourceUri,
+                    outputUri = outputUri,
+                    progressCallback = { progress ->
+                        _state.value = _state.value.copy(progress = progress)
+                    }
+                )
+            } else {
+                ocrProcessor?.makeSearchable(
+                    inputUri = sourceUri,
+                    outputUri = outputUri,
+                    progressCallback = { progress ->
+                        _state.value = _state.value.copy(progress = progress)
+                    }
+                )
+            }
+
             if (result?.success == true) {
                 com.pdfwala.data.SafUriManager.addRecentFile(context, outputUri)
-                
+
                 // Record in history
                 com.pdfwala.data.HistoryManager.recordSuccess(
                     context = context,
@@ -125,7 +187,7 @@ class OcrViewModel : ViewModel() {
                     errorMessage = result.errorMessage
                 )
             }
-            
+
             _state.value = _state.value.copy(
                 isProcessing = false,
                 isComplete = result?.success == true,
@@ -135,13 +197,13 @@ class OcrViewModel : ViewModel() {
             )
         }
     }
-    
+
     fun reset() {
         ocrProcessor?.close()
         ocrProcessor = null
         _state.value = OcrUiState()
     }
-    
+
     override fun onCleared() {
         super.onCleared()
         ocrProcessor?.close()
@@ -161,6 +223,8 @@ enum class OcrViewFormat {
 data class OcrUiState(
     val sourceUri: Uri? = null,
     val sourceName: String = "",
+    val sourceIsImage: Boolean = false,
+    val settingsRestored: Boolean = false,
     val mode: OcrMode = OcrMode.EXTRACT_TEXT,
     val viewFormat: OcrViewFormat = OcrViewFormat.MARKDOWN,
     val isProcessing: Boolean = false,
@@ -187,7 +251,15 @@ fun OcrScreen(
     val state by viewModel.state.collectAsState()
     val scope = rememberCoroutineScope()
     var showFullScreenReader by remember { mutableStateOf(false) }
-    
+
+    // Remember last-used OCR mode across app restarts (#122).
+    LaunchedEffect(Unit) {
+        viewModel.restoreSettings(context)
+    }
+    LaunchedEffect(state.mode) {
+        viewModel.persistSettings(context)
+    }
+
     val pdfPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri ->
@@ -200,13 +272,26 @@ fun OcrScreen(
             viewModel.setSourcePdf(it, name)
         }
     }
-    
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let {
+            val name = context.contentResolver.query(it, null, null, null, null)?.use { cursor ->
+                val nameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                cursor.moveToFirst()
+                cursor.getString(nameIndex)
+            } ?: "Selected image"
+            viewModel.setSourceImage(it, name)
+        }
+    }
+
     val saveDocumentLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/pdf")
     ) { uri ->
         uri?.let { viewModel.makeSearchable(context, it) }
     }
-    
+
     val saveTextLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("text/plain")
     ) { uri ->
@@ -226,7 +311,7 @@ fun OcrScreen(
             }
         }
     }
-    
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -271,7 +356,7 @@ fun OcrScreen(
                     )
                 }
             }
-            
+
             // Source PDF Selection
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -284,18 +369,18 @@ fun OcrScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Source PDF",
+                        text = "Source file (PDF or image)",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
-                    
+
                     if (state.sourceUri != null) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                Icons.Default.PictureAsPdf,
+                                if (state.sourceIsImage) Icons.Default.Image else Icons.Default.PictureAsPdf,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary
                             )
@@ -305,23 +390,51 @@ fun OcrScreen(
                                 modifier = Modifier.weight(1f),
                                 style = MaterialTheme.typography.bodyMedium
                             )
-                            IconButton(onClick = { pdfPickerLauncher.safeLaunch(arrayOf("application/pdf"), context) }) {
-                                Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.action_change))
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            OutlinedButton(
+                                onClick = { pdfPickerLauncher.safeLaunch(arrayOf("application/pdf"), context) },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Default.PictureAsPdf, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("PDF")
+                            }
+                            OutlinedButton(
+                                onClick = { imagePickerLauncher.safeLaunch(arrayOf("image/*"), context) },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Image")
                             }
                         }
                     } else {
-                        OutlinedButton(
-                            onClick = { pdfPickerLauncher.safeLaunch(arrayOf("application/pdf"), context) },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Icon(Icons.Default.FileOpen, contentDescription = null)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(stringResource(R.string.action_select_pdf))
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(
+                                onClick = { pdfPickerLauncher.safeLaunch(arrayOf("application/pdf"), context) },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Default.FileOpen, contentDescription = null)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(stringResource(R.string.action_select_pdf))
+                            }
+                            OutlinedButton(
+                                onClick = { imagePickerLauncher.safeLaunch(arrayOf("image/*"), context) },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Default.Image, contentDescription = null)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Select image (JPG, PNG)")
+                            }
                         }
                     }
                 }
             }
-            
+
             // Mode Selection
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -338,7 +451,7 @@ fun OcrScreen(
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
-                    
+
                     // Extract Text Mode
                     Card(
                         onClick = { viewModel.setMode(OcrMode.EXTRACT_TEXT) },
@@ -374,7 +487,7 @@ fun OcrScreen(
                             }
                         }
                     }
-                    
+
                     // Make Searchable Mode
                     Card(
                         onClick = { viewModel.setMode(OcrMode.MAKE_SEARCHABLE) },
@@ -412,7 +525,7 @@ fun OcrScreen(
                     }
                 }
             }
-            
+
             // Processing State
             AnimatedVisibility(visible = state.isProcessing) {
                 Card(
@@ -440,13 +553,13 @@ fun OcrScreen(
                     }
                 }
             }
-            
+
             // Extracted Text Result
             AnimatedVisibility(
-                visible = state.isComplete && 
-                         !state.isProcessing && 
-                         state.mode == OcrMode.EXTRACT_TEXT &&
-                         state.extractedText.isNotEmpty()
+                visible = state.isComplete &&
+                        !state.isProcessing &&
+                        state.mode == OcrMode.EXTRACT_TEXT &&
+                        state.extractedText.isNotEmpty()
             ) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -546,7 +659,7 @@ fun OcrScreen(
                                 } else null
                             )
                         }
-                        
+
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -556,7 +669,7 @@ fun OcrScreen(
                             )
                         ) {
                             val displayText = if (state.viewFormat == OcrViewFormat.MARKDOWN) state.markdownText else state.extractedText
-                            
+
                             Column(
                                 modifier = Modifier
                                     .padding(12.dp)
@@ -626,7 +739,7 @@ fun OcrScreen(
                                 }
                             }
                         }
-                        
+
                         Text(
                             text = "${state.extractedText.length} characters extracted from ${state.pagesProcessed} pages",
                             style = MaterialTheme.typography.bodySmall,
@@ -635,12 +748,12 @@ fun OcrScreen(
                     }
                 }
             }
-            
+
             // Success State (Make Searchable)
             AnimatedVisibility(
-                visible = state.isComplete && 
-                         !state.isProcessing && 
-                         state.mode == OcrMode.MAKE_SEARCHABLE
+                visible = state.isComplete &&
+                        !state.isProcessing &&
+                        state.mode == OcrMode.MAKE_SEARCHABLE
             ) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -681,7 +794,7 @@ fun OcrScreen(
                     }
                 }
             }
-            
+
             // Error State
             state.error?.let { error ->
                 Card(
@@ -704,9 +817,9 @@ fun OcrScreen(
                     }
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             // Action Button
             Button(
                 onClick = {
@@ -730,7 +843,7 @@ fun OcrScreen(
                     if (state.mode == OcrMode.EXTRACT_TEXT) "Extract Text" else "Make Searchable"
                 )
             }
-            
+
             // Reset Button
             if (state.isComplete) {
                 OutlinedButton(
@@ -778,7 +891,7 @@ fun OcrScreen(
                                         saveTextLauncher.safeLaunch("extracted_text_${System.currentTimeMillis()}.txt", context)
                                     }
                                 }) {
-                                    Icon(Icons.Default.Save, contentDescription = stringResource(R.string.action_save))
+                                    Icon(Icons.Default.Save, contentDescription = stringResource(R.string.pdf_save))
                                 }
                             }
                         )

@@ -10,6 +10,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -43,12 +44,31 @@ fun getToolSections(): List<ToolSectionData> {
         ToolSectionData(stringResource(R.string.category_organize)),
         ToolSectionData(stringResource(R.string.category_convert)),
         ToolSectionData(stringResource(R.string.category_security)),
-        ToolSectionData(stringResource(R.string.imgtools_title)),
+        ToolSectionData(stringResource(R.string.category_image_tools)),
         ToolSectionData(stringResource(R.string.category_view_export))
     )
 }
 
 data class ToolSectionData(val title: String)
+
+/**
+ * Favorite tool ids persisted in SharedPreferences as a string set.
+ */
+private const val FAVORITE_TOOLS_PREFS = "favorite_tools_prefs"
+private const val FAVORITE_TOOLS_KEY = "favorite_tool_ids"
+
+private fun loadFavoriteToolIds(context: android.content.Context): Set<String> {
+    return context.getSharedPreferences(FAVORITE_TOOLS_PREFS, android.content.Context.MODE_PRIVATE)
+        .getStringSet(FAVORITE_TOOLS_KEY, emptySet())
+        .orEmpty()
+}
+
+private fun saveFavoriteToolIds(context: android.content.Context, ids: Set<String>) {
+    context.getSharedPreferences(FAVORITE_TOOLS_PREFS, android.content.Context.MODE_PRIVATE)
+        .edit()
+        .putStringSet(FAVORITE_TOOLS_KEY, ids)
+        .apply()
+}
 
 // Keep for backwards compatibility
 enum class ToolSection(val title: String) {
@@ -73,7 +93,7 @@ data class ToolItem(
 ) {
     @Composable
     fun getTitle(): String = stringResource(titleResId)
-    
+
     @Composable
     fun getDescription(): String = stringResource(descResId)
 }
@@ -91,7 +111,7 @@ fun ToolsScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    
+
     /**
      * Copy content URI to app cache for reliable access.
      * This is critical for picker URIs that lose permission quickly.
@@ -100,16 +120,16 @@ fun ToolsScreen(
         try {
             val cacheDir = File(context.cacheDir, "viewer_cache")
             if (!cacheDir.exists()) cacheDir.mkdirs()
-            
+
             val tempFile = File(cacheDir, "pdf_${System.currentTimeMillis()}.pdf")
-            
+
             // Try to copy the file
             context.contentResolver.openInputStream(uri)?.use { input ->
                 FileOutputStream(tempFile).use { output ->
                     input.copyTo(output)
                 }
             } ?: return@withContext null
-            
+
             // Return file:// URI for direct file access
             Uri.fromFile(tempFile)
         } catch (e: Exception) {
@@ -117,7 +137,7 @@ fun ToolsScreen(
             null
         }
     }
-    
+
     /**
      * PDF picker using SAF (ACTION_OPEN_DOCUMENT).
      * Immediately copies picked file to cache before opening to avoid permission issues.
@@ -130,7 +150,7 @@ fun ToolsScreen(
                 // Take persistable URI permission immediately
                 val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                 val persistedFile = SafUriManager.addRecentFile(context, selectedUri, flags)
-                
+
                 val name = persistedFile?.name?.substringBeforeLast('.') ?: run {
                     var displayName = "PDF Document"
                     context.contentResolver.query(selectedUri, null, null, null, null)?.use { c ->
@@ -143,7 +163,7 @@ fun ToolsScreen(
                     }
                     displayName
                 }
-                
+
                 // CRITICAL: Copy to cache before opening to avoid permission expiration
                 val cachedUri = copyUriToCache(context, selectedUri)
                 if (cachedUri != null) {
@@ -155,9 +175,60 @@ fun ToolsScreen(
             }
         }
     }
-    
+
     val allTools = getAllTools()
-    
+
+    var searchQuery by remember { mutableStateOf("") }
+    var favoriteIds by remember { mutableStateOf(loadFavoriteToolIds(context)) }
+    var showFavoritePicker by remember { mutableStateOf(false) }
+
+    fun toggleFavorite(tool: ToolItem) {
+        val updated = if (favoriteIds.contains(tool.id)) {
+            favoriteIds - tool.id
+        } else {
+            favoriteIds + tool.id
+        }
+        favoriteIds = updated
+        saveFavoriteToolIds(context, updated)
+    }
+
+    fun handleToolClick(tool: ToolItem) {
+        if (tool.screen == Screen.Home && tool.id == "view_pdf") {
+            // Special handling for View PDF
+            pdfPickerLauncher.safeLaunch(arrayOf("application/pdf"), context)
+        } else {
+            // Check if this is an image tool that needs special routing
+            val imageToolIds = listOf("image_compress", "image_resize", "image_convert", "image_metadata")
+            if (imageToolIds.contains(tool.id) && onNavigateToRoute != null) {
+                // Use route with operation parameter for image tools
+                val route = Screen.getRouteForToolId(tool.id)
+                onNavigateToRoute(route)
+            } else {
+                // Use screen object for other tools
+                onNavigateToScreen(tool.screen)
+            }
+        }
+    }
+
+    val trimmedQuery = searchQuery.trim()
+    // Derived so typing only recomputes the filtered lists instead of
+    // re-running string lookups for every card on each keystroke.
+    val searchResults by remember(trimmedQuery) {
+        derivedStateOf {
+            if (trimmedQuery.isEmpty()) {
+                emptyList()
+            } else {
+                allTools.filter { tool ->
+                    context.getString(tool.titleResId).contains(trimmedQuery, ignoreCase = true) ||
+                            context.getString(tool.descResId).contains(trimmedQuery, ignoreCase = true)
+                }
+            }
+        }
+    }
+    val favoriteTools by remember(allTools, favoriteIds) {
+        derivedStateOf { allTools.filter { favoriteIds.contains(it.id) } }
+    }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -173,44 +244,115 @@ fun ToolsScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        
-        // Sections
-        ToolSection.entries.forEach { section ->
-            val sectionTools = allTools.filter { it.section == section }
-            if (sectionTools.isNotEmpty()) {
+
+        // Search
+        item {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                placeholder = { Text(stringResource(R.string.tools_search_hint)) },
+                leadingIcon = {
+                    Icon(Icons.Default.Search, contentDescription = null)
+                },
+                trailingIcon = {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { searchQuery = "" }) {
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.action_cancel))
+                        }
+                    }
+                },
+                singleLine = true,
+                shape = MaterialTheme.shapes.large,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        if (trimmedQuery.isNotEmpty()) {
+            // Search results replace sections while searching
+            item {
+                SectionHeader(title = stringResource(R.string.tools_search_results))
+            }
+
+            if (searchResults.isEmpty()) {
                 item {
-                    SectionHeader(title = getSectionTitle(section))
+                    Text(
+                        text = stringResource(R.string.tools_search_empty),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
                 }
-                
+            } else {
                 item {
                     ToolGrid(
-                        tools = sectionTools,
-                        onToolClick = { tool ->
-                            if (tool.screen == Screen.Home && tool.id == "view_pdf") {
-                                // Special handling for View PDF
-                                pdfPickerLauncher.safeLaunch(arrayOf("application/pdf"), context)
-                            } else {
-                                // Check if this is an image tool that needs special routing
-                                val imageToolIds = listOf("image_compress", "image_resize", "image_convert", "image_metadata")
-                                if (imageToolIds.contains(tool.id) && onNavigateToRoute != null) {
-                                    // Use route with operation parameter for image tools
-                                    val route = Screen.getRouteForToolId(tool.id)
-                                    onNavigateToRoute(route)
-                                } else {
-                                    // Use screen object for other tools
-                                    onNavigateToScreen(tool.screen)
-                                }
-                            }
-                        }
+                        tools = searchResults,
+                        onToolClick = ::handleToolClick
                     )
                 }
             }
+        } else {
+            // Favorites header with add button (grid auto-hidden when none)
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.tools_favorites),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(onClick = { showFavoritePicker = true }) {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = stringResource(R.string.tools_add_favorite)
+                        )
+                    }
+                }
+            }
+
+            if (favoriteTools.isNotEmpty()) {
+                item {
+                    ToolGrid(
+                        tools = favoriteTools,
+                        onToolClick = ::handleToolClick
+                    )
+                }
+            }
+
+            // Sections
+            ToolSection.entries.forEach { section ->
+                val sectionTools = allTools.filter { it.section == section }
+                if (sectionTools.isNotEmpty()) {
+                    item {
+                        SectionHeader(title = getSectionTitle(section))
+                    }
+
+                    item {
+                        ToolGrid(
+                            tools = sectionTools,
+                            onToolClick = ::handleToolClick
+                        )
+                    }
+                }
+            }
         }
-        
+
         // Bottom spacing
         item {
             Spacer(modifier = Modifier.height(80.dp))
         }
+    }
+
+    if (showFavoritePicker) {
+        FavoritePickerDialog(
+            allTools = allTools,
+            favoriteIds = favoriteIds,
+            onToggleFavorite = ::toggleFavorite,
+            onDismiss = { showFavoritePicker = false }
+        )
     }
 }
 
@@ -224,7 +366,7 @@ private fun getSectionTitle(section: ToolSection): String {
         ToolSection.ORGANIZE -> stringResource(R.string.category_organize)
         ToolSection.CONVERT -> stringResource(R.string.category_convert)
         ToolSection.SECURITY -> stringResource(R.string.category_security)
-        ToolSection.IMAGE_TOOLS -> stringResource(R.string.imgtools_title)
+        ToolSection.IMAGE_TOOLS -> stringResource(R.string.category_image_tools)
         ToolSection.VIEW_EXPORT -> stringResource(R.string.category_view_export)
     }
 }
@@ -256,7 +398,7 @@ private fun ToolGrid(
 ) {
     // Use a 3-column grid for compact display
     val rows = tools.chunked(3)
-    
+
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -281,6 +423,72 @@ private fun ToolGrid(
     }
 }
 
+/**
+ * Picker dialog for choosing favorite tools. The tool grid itself stays
+ * untouched; all favorite management happens here.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FavoritePickerDialog(
+    allTools: List<ToolItem>,
+    favoriteIds: Set<String>,
+    onToggleFavorite: (ToolItem) -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.tools_favorites)) },
+        text = {
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                // Group rows by section for quick scanning
+                ToolSection.entries.forEach { section ->
+                    val sectionTools = allTools.filter { it.section == section }
+                    if (sectionTools.isNotEmpty()) {
+                        item(key = "header_${section.name}") {
+                            Text(
+                                text = getSectionTitle(section),
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
+                            )
+                        }
+                        items(
+                            items = sectionTools,
+                            key = { it.id }
+                        ) { tool ->
+                            val checked = favoriteIds.contains(tool.id)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Checkbox(
+                                    checked = checked,
+                                    onCheckedChange = { onToggleFavorite(tool) }
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = tool.getTitle(),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.action_close))
+            }
+        }
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ToolCard(
@@ -289,17 +497,17 @@ private fun ToolCard(
     modifier: Modifier = Modifier
 ) {
     var isVisible by remember { mutableStateOf(false) }
-    
+
     LaunchedEffect(Unit) {
         isVisible = true
     }
-    
+
     val scale by animateFloatAsState(
         targetValue = if (isVisible) 1f else 0.9f,
         animationSpec = tween(durationMillis = 200),
         label = "tool_card_scale"
     )
-    
+
     Card(
         onClick = onClick,
         modifier = modifier
@@ -331,9 +539,9 @@ private fun ToolCard(
                         .size(24.dp)
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Text(
                 text = tool.getTitle(),
                 style = MaterialTheme.typography.labelMedium,
@@ -364,7 +572,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "split",
-        titleResId = R.string.split_title,
+        titleResId = R.string.tool_split_pdf,
         descResId = R.string.desc_split_pdf,
         icon = Icons.Default.CallSplit,
         section = ToolSection.QUICK_ACTIONS,
@@ -372,7 +580,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "compress",
-        titleResId = R.string.compress_title,
+        titleResId = R.string.tool_compress_pdf,
         descResId = R.string.desc_compress_pdf,
         icon = Icons.Default.Compress,
         section = ToolSection.QUICK_ACTIONS,
@@ -380,7 +588,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "pdf_to_image",
-        titleResId = R.string.pdf2img_title,
+        titleResId = R.string.tool_pdf_to_images,
         descResId = R.string.desc_pdf_to_images,
         icon = Icons.Default.PhotoLibrary,
         section = ToolSection.QUICK_ACTIONS,
@@ -388,17 +596,17 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "image_to_pdf",
-        titleResId = R.string.convert_title,
+        titleResId = R.string.tool_images_to_pdf,
         descResId = R.string.desc_images_to_pdf,
         icon = Icons.Default.Image,
         section = ToolSection.QUICK_ACTIONS,
         screen = Screen.Convert
     ),
-    
+
     // SECTION 2: ORGANIZE
     ToolItem(
         id = "reorder",
-        titleResId = R.string.organize_reorder_pages,
+        titleResId = R.string.tool_reorder_pages,
         descResId = R.string.desc_reorder_pages,
         icon = Icons.Default.SwapVert,
         section = ToolSection.ORGANIZE,
@@ -406,7 +614,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "rotate",
-        titleResId = R.string.rotate_title,
+        titleResId = R.string.tool_rotate_pages,
         descResId = R.string.desc_rotate_pages,
         icon = Icons.Default.RotateRight,
         section = ToolSection.ORGANIZE,
@@ -414,7 +622,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "delete_pages",
-        titleResId = R.string.organize_remove_pages,
+        titleResId = R.string.tool_delete_pages,
         descResId = R.string.desc_delete_pages,
         icon = Icons.Default.Delete,
         section = ToolSection.ORGANIZE,
@@ -428,11 +636,19 @@ fun getAllTools(): List<ToolItem> = listOf(
         section = ToolSection.ORGANIZE,
         screen = Screen.Extract
     ),
-    
+    ToolItem(
+        id = "print_studio",
+        titleResId = R.string.tool_print_studio,
+        descResId = R.string.desc_print_studio,
+        icon = Icons.Default.Print,
+        section = ToolSection.ORGANIZE,
+        screen = Screen.PrintStudio
+    ),
+
     // SECTION 3: CONVERT (PDF-CENTRIC)
     ToolItem(
         id = "html_to_pdf",
-        titleResId = R.string.html_title,
+        titleResId = R.string.tool_html_to_pdf,
         descResId = R.string.desc_html_to_pdf,
         icon = Icons.Default.Language,
         section = ToolSection.CONVERT,
@@ -447,8 +663,16 @@ fun getAllTools(): List<ToolItem> = listOf(
         screen = Screen.ScanToPdf
     ),
     ToolItem(
+        id = "doc_to_pdf",
+        titleResId = R.string.tool_doc_to_pdf,
+        descResId = R.string.desc_doc_to_pdf,
+        icon = Icons.Default.Description,
+        section = ToolSection.CONVERT,
+        screen = Screen.DocToPdf
+    ),
+    ToolItem(
         id = "ocr",
-        titleResId = R.string.ocr_title,
+        titleResId = R.string.tool_ocr,
         descResId = R.string.desc_ocr,
         icon = Icons.Default.DocumentScanner,
         section = ToolSection.CONVERT,
@@ -456,13 +680,13 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "extract_text",
-        titleResId = R.string.extract_title,
+        titleResId = R.string.tool_extract_text,
         descResId = R.string.desc_extract_text,
         icon = Icons.Default.TextFields,
         section = ToolSection.CONVERT,
         screen = Screen.ExtractText
     ),
-    
+
     // SECTION 4: SECURITY
     ToolItem(
         id = "lock",
@@ -482,7 +706,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "watermark",
-        titleResId = R.string.watermark_title,
+        titleResId = R.string.tool_add_watermark,
         descResId = R.string.desc_add_watermark,
         icon = Icons.Default.WaterDrop,
         section = ToolSection.SECURITY,
@@ -490,7 +714,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "sign",
-        titleResId = R.string.sign_title,
+        titleResId = R.string.tool_sign_pdf,
         descResId = R.string.desc_sign,
         icon = Icons.Default.Draw,
         section = ToolSection.SECURITY,
@@ -498,7 +722,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "fill_forms",
-        titleResId = R.string.fill_title,
+        titleResId = R.string.tool_fill_forms,
         descResId = R.string.desc_fill_forms,
         icon = Icons.Default.EditNote,
         section = ToolSection.SECURITY,
@@ -506,13 +730,13 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "flatten",
-        titleResId = R.string.flatten_title,
+        titleResId = R.string.tool_flatten_pdf,
         descResId = R.string.desc_flatten_pdf,
         icon = Icons.Default.Layers,
         section = ToolSection.SECURITY,
         screen = Screen.Flatten
     ),
-    
+
     // SECTION 5: IMAGE TOOLS (LOW-BLOAT ONLY)
     ToolItem(
         id = "image_compress",
@@ -546,7 +770,7 @@ fun getAllTools(): List<ToolItem> = listOf(
         section = ToolSection.IMAGE_TOOLS,
         screen = Screen.ImageTools
     ),
-    
+
     // SECTION 6: VIEW & EXPORT
     ToolItem(
         id = "view_pdf",
@@ -558,7 +782,7 @@ fun getAllTools(): List<ToolItem> = listOf(
     ),
     ToolItem(
         id = "page_numbers",
-        titleResId = R.string.pagenum_title,
+        titleResId = R.string.tool_page_numbers,
         descResId = R.string.desc_page_numbers,
         icon = Icons.Default.FormatListNumbered,
         section = ToolSection.VIEW_EXPORT,
