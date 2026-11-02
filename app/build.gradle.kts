@@ -34,7 +34,6 @@ android {
         buildConfigField("boolean", "USE_MLKIT_OCR", "true")
         buildConfigField("boolean", "HAS_NETWORK_URL_TO_PDF", "true")
         buildConfigField("boolean", "HAS_MLKIT_SCANNER", "true")
-        buildConfigField("boolean", "HAS_MLKIT_SCANNER", "true")
     }
 
     signingConfigs {

@@ -746,6 +746,10 @@
     <string name="extract_complete">Extraction Complete</string>
     <string name="extract_success_message">Text extracted successfully!\n\nCharacters: %1$d\nWords: %2$d\nPages: %3$d</string>
 
+    <string name="settings_terms_conditions">Terms &amp; Conditions</string>
+    <string name="settings_terms_conditions_subtitle">Read our terms of use</string>
+    <string name="settings_website">Visit Website</string>
+    <string name="settings_website_subtitle">Explore the official PDF Wala website</string>
 
 <!--    Temporary Strings-->
     <string name="merge_empty_title">No Files Selected</string>

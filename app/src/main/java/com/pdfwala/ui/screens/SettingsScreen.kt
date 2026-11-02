@@ -26,6 +26,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pdfwala.BuildConfig
+import com.pdfwala.PdfWalaApplication
+import com.pdfwala.config.RemoteConfigManager
 import com.pdfwala.ui.components.LicensesDialog
 import com.pdfwala.util.CacheManager
 import com.pdfwala.util.ThemeManager
@@ -89,6 +91,11 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    val remoteConfigManager = remember {
+        (context.applicationContext as PdfWalaApplication)
+            .remoteConfigManager
+    }
     
     var cacheSize by remember { mutableStateOf("Calculating...") }
     var isClearing by remember { mutableStateOf(false) }
@@ -320,7 +327,13 @@ fun SettingsScreen(
                     subtitle = stringResource(R.string.settings_report_bug_subtitle),
                     icon = Icons.Default.BugReport,
                     onClick = {
-                        sendBugReport(context)
+                        sendBugReport(
+                            context,
+                            remoteConfigManager.getAppLink(
+                                "support_email",
+                                RemoteConfigManager.DEFAULT_SUPPORT_EMAIL
+                            )
+                        )
                     }
                 )
             }
@@ -331,7 +344,14 @@ fun SettingsScreen(
                     subtitle = stringResource(R.string.settings_rate_app_subtitle),
                     icon = Icons.Default.Star,
                     onClick = {
-                        openPlayStore(context)
+                        openExternalLink(
+                            context,
+                            remoteConfigManager.getAppLink(
+                                "play_store",
+                                RemoteConfigManager.DEFAULT_PLAY_STORE
+                            ),
+                            "Play Store"
+                        )
                     }
                 )
             }
@@ -356,7 +376,50 @@ fun SettingsScreen(
                     subtitle = stringResource(R.string.settings_privacy_policy_subtitle),
                     icon = Icons.Default.PrivacyTip,
                     onClick = {
-                        openPrivacyPolicy(context)
+                        openExternalLink(
+                            context,
+                            remoteConfigManager.getAppLink(
+                                "privacy_policy",
+                                RemoteConfigManager.DEFAULT_PRIVACY_POLICY
+                            ),
+                            "Privacy Policy"
+                        )
+                    }
+                )
+            }
+
+            item {
+                SettingsItem(
+                    title = stringResource(R.string.settings_terms_conditions),
+                    subtitle = stringResource(R.string.settings_terms_conditions_subtitle),
+                    icon = Icons.Default.Description,
+                    onClick = {
+                        openExternalLink(
+                            context,
+                            remoteConfigManager.getAppLink(
+                                "terms",
+                                RemoteConfigManager.DEFAULT_TERMS
+                            ),
+                            "Terms & Conditions"
+                        )
+                    }
+                )
+            }
+
+            item {
+                SettingsItem(
+                    title = stringResource(R.string.settings_website),
+                    subtitle = stringResource(R.string.settings_website_subtitle),
+                    icon = Icons.Default.Language,
+                    onClick = {
+                        openExternalLink(
+                            context,
+                            remoteConfigManager.getAppLink(
+                                "website",
+                                RemoteConfigManager.DEFAULT_WEBSITE
+                            ),
+                            "Website"
+                        )
                     }
                 )
             }
@@ -632,9 +695,18 @@ fun SettingsScreen(
     // Feature Request Dialog
     if (showFeatureRequestDialog) {
         FeatureRequestDialog(
-            onDismiss = { showFeatureRequestDialog = false },
+            onDismiss = {
+                showFeatureRequestDialog = false
+            },
             onSubmit = { featureText ->
-                sendFeatureRequest(context, featureText)
+                sendFeatureRequest(
+                    context,
+                    featureText,
+                    remoteConfigManager.getAppLink(
+                        "support_email",
+                        RemoteConfigManager.DEFAULT_SUPPORT_EMAIL
+                    )
+                )
                 showFeatureRequestDialog = false
             }
         )
@@ -813,113 +885,99 @@ private fun FeatureRequestDialog(
 
 // Helper functions for intents
 
-/**
- * Developer email for support requests.
- */
-private const val DEVELOPER_EMAIL = "happybytelabs@gmail.com"
-
-private fun sendFeatureRequest(context: Context, featureText: String) {
+private fun sendFeatureRequest(
+    context: Context,
+    featureText: String,
+    supportEmail: String
+) {
     val deviceInfo = """
-        
         ---
         Device: ${Build.MANUFACTURER} ${Build.MODEL}
         Android: ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})
         App Version: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})
     """.trimIndent()
-    
+
     val emailBody = "$featureText\n$deviceInfo"
-    
+
     try {
-        // Restrict to Gmail only
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "message/rfc822"
-            setPackage("com.google.android.gm") // Gmail package
-            putExtra(Intent.EXTRA_EMAIL, arrayOf(DEVELOPER_EMAIL))
+            setPackage("com.google.android.gm")
+            putExtra(Intent.EXTRA_EMAIL, arrayOf(supportEmail))
             putExtra(Intent.EXTRA_SUBJECT, "[Feature Request] PDF Wala")
             putExtra(Intent.EXTRA_TEXT, emailBody)
         }
-        
+
         context.startActivity(intent)
+
     } catch (e: Exception) {
-        // Gmail not installed
         Toast.makeText(
-            context, 
-            "Gmail app is required. Please install Gmail or send feedback to $DEVELOPER_EMAIL", 
+            context,
+            "Gmail app is required. Please install Gmail or send feedback to $supportEmail",
             Toast.LENGTH_LONG
         ).show()
     }
 }
 
-private fun sendBugReport(context: Context) {
+
+private fun sendBugReport(
+    context: Context,
+    supportEmail: String
+) {
     val deviceInfo = """
         Bug Description:
         [Please describe the issue you encountered]
-        
+
         Steps to Reproduce:
-        1. 
-        2. 
-        3. 
-        
+        1.
+        2.
+        3.
+
         Expected Behavior:
         [What did you expect to happen?]
-        
+
         Actual Behavior:
         [What actually happened?]
-        
+
         ---
         Device: ${Build.MANUFACTURER} ${Build.MODEL}
         Android: ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})
         App Version: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})
     """.trimIndent()
-    
+
     try {
-        // Restrict to Gmail only
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "message/rfc822"
-            setPackage("com.google.android.gm") // Gmail package
-            putExtra(Intent.EXTRA_EMAIL, arrayOf(DEVELOPER_EMAIL))
+            setPackage("com.google.android.gm")
+            putExtra(Intent.EXTRA_EMAIL, arrayOf(supportEmail))
             putExtra(Intent.EXTRA_SUBJECT, "[Bug Report] PDF Wala")
             putExtra(Intent.EXTRA_TEXT, deviceInfo)
         }
-        
+
         context.startActivity(intent)
+
     } catch (e: Exception) {
-        // Gmail not installed
         Toast.makeText(
-            context, 
-            "Gmail app is required. Please install Gmail or send bug reports to $DEVELOPER_EMAIL", 
+            context,
+            "Gmail app is required. Please install Gmail or send bug reports to $supportEmail",
             Toast.LENGTH_LONG
         ).show()
     }
 }
 
-private fun openPlayStore(context: Context) {
+private fun openExternalLink(
+    context: Context,
+    url: String,
+    linkName: String
+) {
     try {
         context.startActivity(
-            Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.pdfwala"))
+            Intent(Intent.ACTION_VIEW, Uri.parse(url))
         )
-    } catch (e: Exception) {
-        context.startActivity(
-            Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.pdfwala"))
-        )
-    }
-}
-
-private const val PRIVACY_POLICY_URL =
-    "https://happybyte.web.app/privacy/pdf-wala"
-
-private fun openPrivacyPolicy(context: Context) {
-    try {
-        val intent = Intent(
-            Intent.ACTION_VIEW,
-            Uri.parse(PRIVACY_POLICY_URL)
-        )
-
-        context.startActivity(intent)
     } catch (e: ActivityNotFoundException) {
         Toast.makeText(
             context,
-            "No browser app is available to open the Privacy Policy.",
+            "Unable to open $linkName. No browser app is available.",
             Toast.LENGTH_LONG
         ).show()
     }
